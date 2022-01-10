@@ -5,8 +5,8 @@ class FileOrg:
     def __init__(self, relation_name):
         file_path = f"./{relation_name}.cbd"
         metadata_path = f"./{relation_name}_meta.cbd"
-        self.data_file = open(file_path, "w+")
-        self.metadata_file = open(metadata_path, "w+")
+        self.data_file = open(file_path, "r+")
+        self.metadata_file = open(metadata_path, "r+")
 
     def insert(self):
         raise NotImplementedError
