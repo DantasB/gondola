@@ -3,9 +3,6 @@ class Block:
         self.records = [r for r in buffer.split("\n")[:-1]]
         # split gera um ultimo item vazio
 
-    def append(self, record):
-        self.records.append(record)
-
     def clear(self, ix):
         self.records[ix] = ""
 

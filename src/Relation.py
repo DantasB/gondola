@@ -2,6 +2,9 @@ from Heap import Heap
 from Schema import Schema
 
 
+fileOrgs = {"Heap": Heap}
+
+
 class Relation:
     def __init__(self, fileOrg: str, name: str, column_defs: dict):
         """
@@ -18,6 +21,8 @@ class Relation:
                                               "size": 50
                                           } )
         """
+        self.schema = Schema(relation_name=name, column_defs=column_defs)
+        self.fileOrg = fileOrgs[fileOrg](relation_name=name)
 
     def insert(self):
         """

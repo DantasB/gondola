@@ -2,8 +2,10 @@ import Block
 
 
 class FileOrg:
-    def __init__(self, data_path, metadata_path):
-        self.data_file = open(data_path, "w+")
+    def __init__(self, relation_name):
+        file_path = f"./{relation_name}.cbd"
+        metadata_path = f"./{relation_name}_meta.cbd"
+        self.data_file = open(file_path, "w+")
         self.metadata_file = open(metadata_path, "w+")
 
     def insert(self):
