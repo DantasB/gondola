@@ -11,7 +11,7 @@ class Heap(FileOrg):
 
     def insert(self, record):
         if len(self.empty_list) > 0:
-            ix, offset = self.empty_list[0]
+            ix, offset = self.empty_list[-1]
             block = super().read_block(ix)
             block.write(offset, record)
             super().write_block(block, ix)
@@ -23,8 +23,6 @@ class Heap(FileOrg):
             self.block_count += 1
             for i in range(1, RECORDS_IN_A_BLOCK):
                 self.empty_list.append((last_ix, i))
-        self.updateEmptyList()
-        self.updateBlockCount()
 
     def select(self, filter):
         r = []
@@ -57,11 +55,16 @@ class Heap(FileOrg):
             block = super().read_block(ix)
             if len(block) <= 0:
                 break
-            for i, record in enumerate(block.records):
+            for offset, record in enumerate(block.records):
                 if filter(record):
-                    block.clear(i)
+                    block.clear(offset)
+                    self.empty_list.append((ix, offset))
                     super().write_block(block, ix)
             ix += 1
+
+    def persist(self):
+        self.updateEmptyList()
+        self.updateBlockCount()
 
     def reorganize(self):
         pass
