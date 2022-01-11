@@ -10,21 +10,5 @@ class Ordered(FileOrg):
     def insert(self):
         pass
 
-    def select(self, filter):
-        r = []
-        ix = 0
-        while True:
-            block = super().read_block(ix)
-            if len(block) <= 0:
-                break
-            for record in block.records:
-                if filter(record):
-                    r.append(record)
-            ix += 1
-        return r
-
-    def delete(self):
-        pass
-
     def reorganize(self):
         pass

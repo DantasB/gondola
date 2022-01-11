@@ -24,19 +24,6 @@ class Heap(FileOrg):
             for i in range(1, RECORDS_IN_A_BLOCK):
                 self.empty_list.append((last_ix, i))
 
-    def select(self, filter):
-        r = []
-        ix = 0
-        while True:
-            block = super().read_block(ix)
-            if len(block) <= 0:
-                break
-            for record in block.records:
-                if filter(record):
-                    r.append(record)
-            ix += 1
-        return r
-
     def updateEmptyList(self):
         lines = self.metadata_file.readlines()
         lines[0] = "".join(self.empty_list) + "\n"
@@ -48,19 +35,6 @@ class Heap(FileOrg):
         lines[1] = "".join(self.block_count) + "\n"
         self.metadata_file.seek(0)
         self.metadata_file.writelines(lines)
-
-    def delete(self, filter):
-        ix = 0
-        while True:
-            block = super().read_block(ix)
-            if len(block) <= 0:
-                break
-            for offset, record in enumerate(block.records):
-                if filter(record):
-                    block.clear(offset)
-                    self.empty_list.append((ix, offset))
-                    super().write_block(block, ix)
-            ix += 1
 
     def persist(self):
         self.updateEmptyList()

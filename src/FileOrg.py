@@ -7,14 +7,35 @@ class FileOrg:
         metadata_path = f"./{relation_name}_meta.cbd"
         self.data_file = open(file_path, "r+")
         self.metadata_file = open(metadata_path, "r+")
+        self.empty_list = []
+
+    def select(self, filter):
+        r = []
+        ix = 0
+        while True:
+            bytes, block = self.read_block(ix)
+            if len(bytes) <= 0:
+                break
+            for record in block.records:
+                if filter(record):
+                    r.append(record)
+            ix += 1
+        return r
+
+    def delete(self, filter):
+        ix = 0
+        while True:
+            block = self.read_block(ix)
+            if len(block) <= 0:
+                break
+            for offset, record in enumerate(block.records):
+                if filter(record):
+                    block.clear(offset)
+                    self.empty_list.append((ix, offset))
+                    self.write_block(block, ix)
+            ix += 1
 
     def insert(self):
-        raise NotImplementedError
-
-    def select(self):
-        raise NotImplementedError
-
-    def delete(self):
         raise NotImplementedError
 
     def reorganize(self):
