@@ -7,6 +7,8 @@ class Ordered(FileOrg):
         self.empty_list = self.metadata_file.readline()
         self.block_count = self.metadata_file.readline()
 
+    def searchIndex(self, index):
+
     def insert(self):
         pass
 

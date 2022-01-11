@@ -2,12 +2,15 @@ from FileOrg import FileOrg
 from Schema import Schema
 from Block import Block
 
+# TODO empty_list precisa ser um list, e não string
+
 
 class Heap(FileOrg):
     def __init__(self, relation_name):
         super().__init__(relation_name)
         self.empty_list = self.metadata_file.readline()
         self.block_count = self.metadata_file.readline()
+        self.record_count = self.metadata_file.readline()
 
     def insert(self, record):
         if len(self.empty_list) > 0:
@@ -24,21 +27,13 @@ class Heap(FileOrg):
             for i in range(1, RECORDS_IN_A_BLOCK):
                 self.empty_list.append((last_ix, i))
 
-    def updateEmptyList(self):
-        lines = self.metadata_file.readlines()
-        lines[0] = "".join(self.empty_list) + "\n"
-        self.metadata_file.seek(0)
-        self.metadata_file.writelines(lines)
-
-    def updateBlockCount(self):
-        lines = self.metadata_file.readlines()
-        lines[1] = "".join(self.block_count) + "\n"
-        self.metadata_file.seek(0)
-        self.metadata_file.writelines(lines)
-
     def persist(self):
-        self.updateEmptyList()
-        self.updateBlockCount()
+        lines = []
+        lines.append(self.empty_list + "\n")
+        lines.append(self.block_count + "\n")
+        lines.append(self.record_count + '\n')
+        self.metadata_file.seek(0)
+        self.metadata_file.writelines(lines)
 
     def reorganize(self):
         pass
