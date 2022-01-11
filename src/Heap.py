@@ -20,9 +20,11 @@ class Heap(FileOrg):
             new_block = Block()
             new_block.append(record)
             last_ix = super().append_block(new_block)
+            self.block_count += 1
             for i in range(1, RECORDS_IN_A_BLOCK):
                 self.empty_list.append((last_ix, i))
         self.updateEmptyList()
+        self.updateBlockCount()
 
     def select(self, filter):
         r = []
@@ -43,8 +45,23 @@ class Heap(FileOrg):
         self.metadata_file.seek(0)
         self.metadata_file.writelines(lines)
 
-    def delete(self):
-        pass
+    def updateBlockCount(self):
+        lines = self.metadata_file.readlines()
+        lines[1] = "".join(self.block_count) + "\n"
+        self.metadata_file.seek(0)
+        self.metadata_file.writelines(lines)
+
+    def delete(self, filter):
+        ix = 0
+        while True:
+            block = super().read_block(ix)
+            if len(block) <= 0:
+                break
+            for i, record in enumerate(block.records):
+                if filter(record):
+                    block.clear(i)
+                    super().write_block(block, ix)
+            ix += 1
 
     def reorganize(self):
         pass
