@@ -1,3 +1,6 @@
+from Record import Record
+
+
 class Block:
     def __init__(self, buffer=""):
         self.records = [Record(r) for r in buffer.split("\n")[:-1]]
@@ -8,7 +11,7 @@ class Block:
         self.records[ix] = Record()
 
     def to_string(self):
-        return '\n'.join([record.toStrecording() for record in self.records]) + '\n'
+        return '\n'.join([record.toString() for record in self.records]) + '\n'
 
     def write(self, offset, record):
         if len(self.records) == offset:
