@@ -9,7 +9,7 @@ class Ordered(FileOrg):
         self.empty_list = self.metadata_file.readline()
         self.block_count = self.metadata_file.readline()
         self.record_count = self.metadata_file.readline()
-        self.heap = Heap(relation_name + ' extension', one_file=True)
+        self.heap = Heap(relation_name + '_extension', one_file=True)
 
         self.need_reorganize = False
 
@@ -18,10 +18,12 @@ class Ordered(FileOrg):
             self.reorganize()
         record_block_ix = int(index/RECORDS_IN_A_BLOCK)
         record_block_offset = index % RECORDS_IN_A_BLOCK
-        block = super().read_block(record_block_ix)
+        block = super().readBlock(record_block_ix)
         return block[record_block_offset]
 
-    def binarySearch(self, id, start, end):
+    def binarySearch(self, id, start=0, end=None):
+        if end == None:
+            end = self.record_count-1
         if end - start < 1:
             for i in range(start, end+1):
                 p_record = self.searchIndex(i)
@@ -48,25 +50,25 @@ class Ordered(FileOrg):
             first_id = self.record_count
         if last_id > self.record_count-1:
             last_id = self.record_count
-        first = self.binarySearch(first_id, 0, self.record_count-1)
-        last = self.binarySearch(last_id, 0, self.record_count-1)
+        first = self.binarySearch(first_id)
+        last = self.binarySearch(last_id)
 
         for ix in range(first.ix, last.ix + 1):
-            block = super().read_block(ix)
+            block = super().readBlock(ix)
             for record in block.records:
                 if record.id >= first_id and record.id <= last_id:
                     r.append(record)
 
-    def selectSingle(self, id):
+    def selectId(self, id):
         if self.need_reorganize:
             self.reorganize()
-        return self.binarySearch(id, 0, self.record_count-1)
+        return self.binarySearch(id)
 
     def selectList(self, filter_list):
         r = []
         for l in filter_list:
             try:
-                record = self.selectSingle(l)
+                record = self.selectId(l)
                 r.append(record)
             except:
                 pass
@@ -74,21 +76,8 @@ class Ordered(FileOrg):
 
     def insert(self, record):
         # # # O WRITE NESSE CASO DEVE SER FEITO NO ARQUIVO DE EXTENSÃO!!!
-
-        # se o bloco ainda tiver espaço
-        if((offset + REGISTER_SIZE) < BLOCK_SIZE):
-            block = super().read_block(ix)
-            block.append(record)
-            super().write_block(block, ix)
-        else:
-            new_block = Block()
-            new_block.append(record)
-            super().write_block(new_block, ix)
-            self.extension_block_count += 1
-
-            # ler último bloco registrado no arquivo de extensão -> last_block
-            # ver se ele tem espaço (como o tamanho do registro é fixo, é mais fácil de ver isso)
-            # caso tenha, alocar nele, caso não, num novo
+        self.heap.insert(record)
+        self.record_count += 1
 
 
 def reorganize(self):

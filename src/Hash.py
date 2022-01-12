@@ -1,5 +1,6 @@
 from FileOrg import FileOrg
 from typing import List
+from Block import Block
 
 
 class StaticHash(FileOrg):
@@ -16,17 +17,14 @@ class StaticHash(FileOrg):
             bucket, offset = self.__hashing(record.key).split('|')
             if len(self.empty_list) > 0:
                 ix, offset = self.empty_list[-1]
-                block = self.read_block(ix)
-                block.write(offset, record)
-                self.write_block(block, ix)
+                self.writeRecord(ix, offset, record)
                 self.empty_list.pop()
             else:
                 new_block = Block()
                 new_block.append(record)
-                last_ix = self.append_block(new_block)
-                self.block_count += 1
+                self.append_block(new_block)
             for i in range(1, RECORDS_IN_A_BLOCK):
-                self.empty_list.append((last_ix, i))
+                self.empty_list.append((self.block_count, i))
             wanted_data = {}
             if(type(data) == List):
                 for e in range(len(data)):

@@ -19,7 +19,7 @@ class FileOrg:
         ix = 0
         while True:
             try:
-                block = self.read_block(ix)
+                block = self.readBlock(ix)
             except:
                 break
             for record in block.records:
@@ -32,14 +32,14 @@ class FileOrg:
         ix = 0
         while True:
             try:
-                block = self.read_block(ix)
+                block = self.readBlock(ix)
             except:
                 break
             for offset, record in enumerate(block.records):
                 if filter(record):
                     block.clear(offset)
                     self.empty_list.append((ix, offset))
-                    self.write_block(block, ix)
+            self.writeBlock(block, ix)
             ix += 1
 
     def insert(self):
@@ -48,17 +48,23 @@ class FileOrg:
     def reorganize(self):
         raise NotImplementedError
 
-    def write_block(self, block, ix):
+    def writeBlock(self, block, ix):
         self.data_file.seek(ix * BLOCK_SIZE + HEADER_SIZE)
         self.data_file.write(block.to_string())
 
-    def append_block(self, block):
+    def appendBlock(self, block):
         self.data_file.seek(0, 2)  # set pointer to data_file end
         self.data_file.write(block.to_string())
+        self.block_count += 1
 
-    def read_block(self, ix):
+    def readBlock(self, ix):
         self.data_file.seek(ix * BLOCK_SIZE + HEADER_SIZE)
         buffer = self.data_file.read(BLOCK_SIZE)
         if len(buffer) == 0:
             raise Exception("[ERROR] NO MORE BLOCKS TO READ")
-        return len(buffer), Block(buffer)
+        return Block(buffer)
+
+    def writeRecord(self, block_ix, block_offset, record):
+        block = self.readBlock(block_ix)
+        block.write(block_offset, record)
+        self.writeBlock(block, block_ix)

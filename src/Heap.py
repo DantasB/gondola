@@ -16,17 +16,17 @@ class Heap(FileOrg):
     def insert(self, record):
         if len(self.empty_list) > 0:
             ix, offset = self.empty_list[-1]
-            block = self.read_block(ix)
+            block = self.readBlock(ix)
             block.write(offset, record)
-            self.write_block(block, ix)
+            self.writeBlock(block, ix)
             self.empty_list.pop()
         else:
             new_block = Block()
             new_block.append(record)
-            last_ix = self.append_block(new_block)
-            self.block_count += 1
+            self.append_block(new_block)
             for i in range(1, RECORDS_IN_A_BLOCK):
-                self.empty_list.append((last_ix, i))
+                self.empty_list.append((self.block_count, i))
+        self.record_count += 1
 
     def persist(self):
         lines = []
