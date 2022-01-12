@@ -1,20 +1,26 @@
 import Block
+import os
 
 
 class FileOrg:
-    def __init__(self, relation_name):
-        file_path = f"./{relation_name}.cbd"
-        metadata_path = f"./{relation_name}_meta.cbd"
+    def __init__(self, relation_name, schema_header):
+        file_path = f"./{relation_name}/data.cbd"
+        metadata_path = f"./{relation_name}/metadata.cbd"
         self.data_file = open(file_path, "r+")
+        self.data_file.seek(0)
+        self.data_file.write(schema_header)
         self.metadata_file = open(metadata_path, "r+")
         self.empty_list = []
+        self.block_count = 0
+        self.record_count = 0
 
     def select(self, filter):
         r = []
         ix = 0
         while True:
-            bytes, block = self.read_block(ix)
-            if len(bytes) <= 0:
+            try:
+                block = self.read_block(ix)
+            except:
                 break
             for record in block.records:
                 if filter(record):
@@ -25,8 +31,9 @@ class FileOrg:
     def delete(self, filter):
         ix = 0
         while True:
-            block = self.read_block(ix)
-            if len(block) <= 0:
+            try:
+                block = self.read_block(ix)
+            except:
                 break
             for offset, record in enumerate(block.records):
                 if filter(record):
@@ -52,4 +59,6 @@ class FileOrg:
     def read_block(self, ix):
         self.data_file.seek(ix * BLOCK_SIZE + HEADER_SIZE)
         buffer = self.data_file.read(BLOCK_SIZE)
+        if len(buffer) == 0:
+            raise Exception("[ERROR] NO MORE BLOCKS TO READ")
         return len(buffer), Block(buffer)

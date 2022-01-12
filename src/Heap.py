@@ -6,23 +6,24 @@ from Block import Block
 
 
 class Heap(FileOrg):
-    def __init__(self, relation_name):
+    def __init__(self, relation_name, one_file=False):
         super().__init__(relation_name)
-        self.empty_list = self.metadata_file.readline()
-        self.block_count = self.metadata_file.readline()
-        self.record_count = self.metadata_file.readline()
+        if not one_file:
+            self.empty_list = self.metadata_file.readline()
+            self.block_count = self.metadata_file.readline()
+            self.record_count = self.metadata_file.readline()
 
     def insert(self, record):
         if len(self.empty_list) > 0:
             ix, offset = self.empty_list[-1]
-            block = super().read_block(ix)
+            block = self.read_block(ix)
             block.write(offset, record)
-            super().write_block(block, ix)
+            self.write_block(block, ix)
             self.empty_list.pop()
         else:
             new_block = Block()
             new_block.append(record)
-            last_ix = super().append_block(new_block)
+            last_ix = self.append_block(new_block)
             self.block_count += 1
             for i in range(1, RECORDS_IN_A_BLOCK):
                 self.empty_list.append((last_ix, i))
