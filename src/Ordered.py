@@ -5,8 +5,8 @@ from copy import deepcopy
 
 
 class Ordered(FileOrg):
-    def __init__(self, relation_name):
-        super().__init__(relation_name)
+    def __init__(self, relation_name, schema_header):
+        super().__init__(relation_name, schema_header)
         self.empty_list = self.metadata_file.readline()
         self.block_count = self.metadata_file.readline()
         self.record_count = self.metadata_file.readline()
@@ -84,8 +84,7 @@ class Ordered(FileOrg):
         if(len(records) == 1):
             return records[0]
         else:
-
-        pass
+            print('foi')
 
     def reorganize(self):
         new_records = []

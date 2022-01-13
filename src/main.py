@@ -1,13 +1,25 @@
 from Relation import Relation
 
 
-def initDatabase(fileOrg):
-    pass
+def validate_heap():
+    name = "Amigos"
+    fileOrg = "Heap"
+    column_defs = {
+        "id": {
+            "type": "int",
+            "size": 10
+        },
+        "nome": {
+            "type": "varchar",
+            "size": 255
+        }
+    }
+    relation = Relation(fileOrg, name, column_defs)
+    relation.insert({'id': 555, 'nome': 'lauzudo'})
 
 
 def main():
-    fileOrg = "Heap"
-    initDatabase(fileOrg)
+    validate_heap()
     return
 
 

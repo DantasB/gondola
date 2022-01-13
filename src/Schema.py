@@ -9,7 +9,7 @@ class Schema:
             column_info = column_defs[column_key]
             self.columns.append(
                 Column(
-                    name=column_key, type=column_info["type"], size=column_info["size"]
+                    name=column_key, column_type=column_info["type"], size=column_info["size"]
                 )
             )
 

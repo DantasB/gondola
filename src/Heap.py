@@ -6,8 +6,8 @@ from Block import Block
 
 
 class Heap(FileOrg):
-    def __init__(self, relation_name, one_file=False):
-        super().__init__(relation_name)
+    def __init__(self, relation_name, schema_header, one_file=False):
+        super().__init__(relation_name, schema_header)
         if not one_file:
             self.empty_list = self.metadata_file.readline()
             self.block_count = self.metadata_file.readline()
@@ -22,7 +22,7 @@ class Heap(FileOrg):
             self.empty_list.pop()
         else:
             new_block = Block()
-            new_block.append(record)
+            new_block.records.append(record)
             self.append_block(new_block)
             self.empty_list.append((self.block_count, record.size))
         self.record_count += 1

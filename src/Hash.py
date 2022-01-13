@@ -3,10 +3,10 @@ from typing import List
 from Block import Block
 
 
-class StaticHash(FileOrg):
+class Hash(FileOrg):
 
-    def __init__(self, relation_name, bucket_size):
-        super().__init__(relation_name)
+    def __init__(self, relation_name, schema_header, bucket_size):
+        super().__init__(relation_name, schema_header)
         self.bucket_size = bucket_size
 
     def __hashing(self, key: int) -> hash:
