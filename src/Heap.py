@@ -9,9 +9,9 @@ class Heap(FileOrg):
     def __init__(self, relation_name, schema_header, one_file=False):
         super().__init__(relation_name, schema_header)
         if not one_file:
-            self.empty_list = self.metadata_file.readline()
-            self.block_count = self.metadata_file.readline()
-            self.record_count = self.metadata_file.readline()
+            self.empty_list = self.metadata_file.readline().split(',')
+            self.block_count = int(self.metadata_file.readline())
+            self.record_count = int(self.metadata_file.readline())
 
     def insert(self, record):
         if len(self.empty_list) > 0:

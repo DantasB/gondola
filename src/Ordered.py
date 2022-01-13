@@ -8,8 +8,8 @@ class Ordered(FileOrg):
     def __init__(self, relation_name, schema_header):
         super().__init__(relation_name, schema_header)
         self.empty_list = self.metadata_file.readline()
-        self.block_count = self.metadata_file.readline()
-        self.record_count = self.metadata_file.readline()
+        self.block_count = int(self.metadata_file.readline())
+        self.record_count = int(self.metadata_file.readline())
         self.heap = Heap(relation_name + '_extension', one_file=True)
 
         self.need_reorganize = False

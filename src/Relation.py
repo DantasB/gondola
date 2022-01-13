@@ -2,7 +2,7 @@ from Heap import Heap
 from Hash import Hash
 from Ordered import Ordered
 from Schema import Schema
-
+from Record import Record
 
 fileOrgs = {"Heap": Heap, "Hash": Hash, "Ordered": Ordered}
 
@@ -27,8 +27,8 @@ class Relation:
         self.fileOrg = fileOrgs[fileOrg](
             relation_name=name, schema_header=self.schema.metadata())
 
-    def insert(self, data: dict):
-        self.fileOrg.insert(data)
+    def insert(self, data):
+        self.fileOrg.insert(Record(data))
 
     def select(self, filter=["all", "in", "between"]):
         self.fileOrg.select(filter)

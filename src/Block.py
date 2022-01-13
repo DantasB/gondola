@@ -3,7 +3,6 @@ from Record import Record
 
 class Block:
     def __init__(self, buffer=""):
-        breakpoint()
         self.records = [Record(content=record, size=len(record))
                         for record in buffer.split("\n")[:-1]]
 
@@ -30,7 +29,6 @@ class Block:
         self.records[ix] = Record(size=old.size)
 
     def to_string(self):
-        breakpoint()
         return '\n'.join([record.to_string() for record in self.records]) + '\n'
 
     def write(self, offset, record):

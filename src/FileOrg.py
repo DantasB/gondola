@@ -4,8 +4,8 @@ import os
 
 class FileOrg:
     def __init__(self, relation_name, schema_header):
-        file_path = f"./{relation_name}/data.cbd"
-        metadata_path = f"./{relation_name}/metadata.cbd"
+        file_path = f"/home/guilherme/ufrj/gondola/src/Amigos/data.cbd"
+        metadata_path = f"/home/guilherme/ufrj/gondola/src/Amigos/metadata.cbd"
         self.data_file = open(file_path, "r+")
         self.data_file.seek(0)
         self.data_file.write(schema_header)

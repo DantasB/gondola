@@ -15,7 +15,9 @@ def validate_heap():
         }
     }
     relation = Relation(fileOrg, name, column_defs)
-    relation.insert({'id': 555, 'nome': 'lauzudo'})
+    relation.insert(
+        ('555, "lauzudo"')
+    )
 
 
 def main():
