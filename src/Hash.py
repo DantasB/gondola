@@ -17,14 +17,13 @@ class StaticHash(FileOrg):
             bucket, offset = self.__hashing(record.key).split('|')
             if len(self.empty_list) > 0:
                 ix, offset = self.empty_list[-1]
-                self.writeRecord(ix, offset, record)
+                self.write_record(ix, offset, record)
                 self.empty_list.pop()
             else:
                 new_block = Block()
                 new_block.append(record)
                 self.append_block(new_block)
-            for i in range(1, RECORDS_IN_A_BLOCK):
-                self.empty_list.append((self.block_count, i))
+                self.empty_list.append((self.block_count, record.size))
             wanted_data = {}
             if(type(data) == List):
                 for e in range(len(data)):

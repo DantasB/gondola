@@ -19,7 +19,7 @@ class FileOrg:
         ix = 0
         while True:
             try:
-                block = self.readBlock(ix)
+                block = self.read_block(ix)
             except:
                 break
             for record in block.records:
@@ -32,14 +32,14 @@ class FileOrg:
         ix = 0
         while True:
             try:
-                block = self.readBlock(ix)
+                block = self.read_block(ix)
             except:
                 break
-            for offset, record in enumerate(block.records):
+            for record in block.records:
                 if filter(record):
-                    block.clear(offset)
-                    self.empty_list.append((ix, offset))
-            self.writeBlock(block, ix)
+                    block.clear(record.offset)
+                    self.empty_list.append((ix, record.offset))
+            self.write_block(block, ix)
             ix += 1
 
     def insert(self):
@@ -48,23 +48,24 @@ class FileOrg:
     def reorganize(self):
         raise NotImplementedError
 
-    def writeBlock(self, block, ix):
+    def write_block(self, block, ix):
         self.data_file.seek(ix * BLOCK_SIZE + HEADER_SIZE)
         self.data_file.write(block.to_string())
 
-    def appendBlock(self, block):
+    def append_block(self, block):
         self.data_file.seek(0, 2)  # set pointer to data_file end
         self.data_file.write(block.to_string())
         self.block_count += 1
 
-    def readBlock(self, ix):
+    def read_block(self, ix):
         self.data_file.seek(ix * BLOCK_SIZE + HEADER_SIZE)
         buffer = self.data_file.read(BLOCK_SIZE)
         if len(buffer) == 0:
             raise Exception("[ERROR] NO MORE BLOCKS TO READ")
         return Block(buffer)
 
-    def writeRecord(self, block_ix, block_offset, record):
-        block = self.readBlock(block_ix)
-        block.write(block_offset, record)
-        self.writeBlock(block, block_ix)
+    def write_record(self, block_ix, block_offset, record):
+        block = self.read_block(block_ix)
+        new_empty = block.write(block_offset, record)
+        self.write_block(block, block_ix)
+        return new_empty

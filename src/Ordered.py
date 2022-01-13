@@ -1,6 +1,7 @@
 from FileOrg import FileOrg
 from Block import Block
 from Heap import Heap
+from copy import deepcopy
 
 
 class Ordered(FileOrg):
@@ -13,36 +14,36 @@ class Ordered(FileOrg):
 
         self.need_reorganize = False
 
-    def searchIndex(self, index):
+    def search_index(self, index):
         if self.need_reorganize:
             self.reorganize()
-        record_block_ix = int(index/RECORDS_IN_A_BLOCK)
-        record_block_offset = index % RECORDS_IN_A_BLOCK
-        block = super().readBlock(record_block_ix)
-        return block[record_block_offset]
+        block_ix = int(index/RECORDS_IN_A_BLOCK)
+        block_offset = (index % RECORDS_IN_A_BLOCK) * RECORD_SIZE
+        block = super().read_block(block_ix)
+        return block.read(block_offset)
 
-    def binarySearch(self, id, start=0, end=None):
+    def __binary_search(self, id, start=0, end=None):
         if end == None:
             end = self.record_count-1
         if end - start < 1:
             for i in range(start, end+1):
-                p_record = self.searchIndex(i)
+                p_record = self.search_index(i)
                 p_id = p_record.id
                 if id == p_record.id:
                     return p_record
             raise Exception('[ERROR] Couldnt find record')
 
         p = int((end - start)/2 + start)
-        p_record = self.searchIndex(p)
+        p_record = self.search_index(p)
         p_id = p_record.id
         if id == p_id:
             return p_record
         elif id < p_id:
-            return self.binarySearch(id, start, p-1)
+            return self.__binary_search(id, start, p-1)
         else:
-            return self.binarySearch(id, p+1, end)
+            return self.__binary_search(id, p+1, end)
 
-    def selectRange(self, first_id, last_id):
+    def select_range(self, first_id, last_id):
         if self.need_reorganize:
             self.reorganize()
         r = []
@@ -50,39 +51,56 @@ class Ordered(FileOrg):
             first_id = self.record_count
         if last_id > self.record_count-1:
             last_id = self.record_count
-        first = self.binarySearch(first_id)
-        last = self.binarySearch(last_id)
+        first = self.__binary_search(first_id)
+        last = self.__binary_search(last_id)
 
         for ix in range(first.ix, last.ix + 1):
-            block = super().readBlock(ix)
+            block = super().read_block(ix)
             for record in block.records:
                 if record.id >= first_id and record.id <= last_id:
                     r.append(record)
 
-    def selectId(self, id):
+    def select_id(self, id):
         if self.need_reorganize:
             self.reorganize()
-        return self.binarySearch(id)
+        return self.__binary_search(id)
 
-    def selectList(self, filter_list):
+    def select_list(self, filter_list):
         r = []
         for l in filter_list:
             try:
-                record = self.selectId(l)
+                record = self.select_id(l)
                 r.append(record)
             except:
                 pass
         return r
 
     def insert(self, record):
-        # # # O WRITE NESSE CASO DEVE SER FEITO NO ARQUIVO DE EXTENSÃO!!!
+        # adições serão feitas de maneira indiscriminada (não serão reorganizadas no momento chave)
         self.heap.insert(record)
-        self.record_count += 1
+        self.heap.record_count += 1
 
+    def __merge_sort(self, records, order_field):
+        if(len(records) == 1):
+            return records[0]
+        else:
 
-def reorganize(self):
-    # for i in range(1, self.extension_block_count-1, BLOCK_SIZE):
-    # ler as entradas no arquivo de extensão
-    # retirar todos os records marcados como deletados
-    # fazer um merge sort com os registros que tenham sobrado
-    pass
+        pass
+
+    def reorganize(self):
+        new_records = []
+        # ler as entradas no arquivo de extensão
+        new_records = [new_rec for new_rec in self.heap.data_file.readlines()]
+        # apagar tudo desse arquivo após ter recuperado a informação
+        self.heap.reset()
+
+        # pega os registros atuais (no arquivo original), e filtra pelos que não estão marcados como deletados)
+        records = self.select(lambda record: not record.isEmpty)
+
+        # id é apenas um exemplo de possibilidade de campo pelo qual ordenar
+        sorted_records = self.__merge_sort(
+            new_records + filtered_excluded_records, "id")
+
+        # retirar todos os records marcados como deletados
+        # fazer um merge sort com os registros que tenham sobrado
+        pass

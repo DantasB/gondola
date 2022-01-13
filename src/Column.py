@@ -1,8 +1,8 @@
 class Column:
-    def __init__(self, name, type, size):
+    def __init__(self, name, column_type, size):
         self.name = name
-        self.type = type
+        self.column_type = column_type
         self.size = size
 
     def metadata(self):
-        return f"{self.name}|{self.type}|{self.size}"
+        return f"{self.name}|{self.column_type}|{self.size}"
