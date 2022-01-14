@@ -4,11 +4,8 @@ from Block import Block
 
 
 class VLHeap(FileOrg):
-    def __init__(self, relation_name, schema_header):
-        super().__init__(relation_name, schema_header)
-        self.empty_list = self.metadata_file.readline()
-        self.block_count = int(self.metadata_file.readline())
-        self.record_count = int(self.metadata_file.readline())
+    def __init__(self, relation_name):
+        super().__init__(relation_name)
 
     def __findEmpty(self, size):
         for i, (ix, offset, r_size) in enumerate(self.empty_list):
@@ -27,7 +24,7 @@ class VLHeap(FileOrg):
             new_block.append(record)
             self.append_block(new_block)
             self.empty_list.append(
-                (self.block_count, record.size, BLOCK_SIZE - record.size)
+                (self.block_count, record.size, self.BLOCK_SIZE - record.size)
             )
         self.record_count += 1
 

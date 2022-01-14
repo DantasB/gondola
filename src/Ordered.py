@@ -7,9 +7,6 @@ from copy import deepcopy
 class Ordered(FileOrg):
     def __init__(self, relation_name, schema_header):
         super().__init__(relation_name, schema_header)
-        self.empty_list = self.metadata_file.readline()
-        self.block_count = int(self.metadata_file.readline())
-        self.record_count = int(self.metadata_file.readline())
         self.heap = Heap(relation_name + '_extension', one_file=True)
 
         self.need_reorganize = False
@@ -17,20 +14,20 @@ class Ordered(FileOrg):
     def search_index(self, index):
         if self.need_reorganize:
             self.reorganize()
-        block_ix = int(index/RECORDS_IN_A_BLOCK)
-        block_offset = (index % RECORDS_IN_A_BLOCK) * RECORD_SIZE
+        block_ix = int(index/self.RECORDS_IN_A_BLOCK)
+        block_offset = (index % self.RECORDS_IN_A_BLOCK) * self.RECORD_SIZE
         block = super().read_block(block_ix)
-        return block.read(block_offset)
+        return block_ix, block.read(block_offset)
 
     def __binary_search(self, id, start=0, end=None):
         if end == None:
             end = self.record_count-1
         if end - start < 1:
             for i in range(start, end+1):
-                p_record = self.search_index(i)
+                ix, p_record = self.search_index(i)
                 p_id = p_record.id
                 if id == p_record.id:
-                    return p_record
+                    return ix, p_record
             raise Exception('[ERROR] Couldnt find record')
 
         p = int((end - start)/2 + start)
@@ -51,10 +48,10 @@ class Ordered(FileOrg):
             first_id = self.record_count
         if last_id > self.record_count-1:
             last_id = self.record_count
-        first = self.__binary_search(first_id)
-        last = self.__binary_search(last_id)
+        first_ix, _ = self.__binary_search(first_id)
+        last_ix, _ = self.__binary_search(last_id)
 
-        for ix in range(first.ix, last.ix + 1):
+        for ix in range(first_ix, last_ix + 1):
             block = super().read_block(ix)
             for record in block.records:
                 if record.id >= first_id and record.id <= last_id:
@@ -63,7 +60,7 @@ class Ordered(FileOrg):
     def select_id(self, id):
         if self.need_reorganize:
             self.reorganize()
-        return self.__binary_search(id)
+        return self.__binary_search(id)[1]
 
     def select_list(self, filter_list):
         r = []

@@ -1,9 +1,15 @@
 class Record:
-    def __init__(self, size, content=''):
+    def __init__(self, offset, content='', size=0):
+        self.offset = offset
         self.content = content
-        self.size = size
-        self.block = None
-        self.offset = None
+        if len(content) > 0:
+            self.size = len(content.encode('utf-8'))
+            self.attributes = content.split('|')
+        else:
+            self.size = size
+
+    def __getitem__(self, key):
+        return self.attributes[key]
 
     def to_string(self):
         return self.content

@@ -25,12 +25,12 @@ class Hash(FileOrg):
                 self.append_block(new_block)
                 self.empty_list.append((self.block_count, record.size))
             wanted_data = {}
-            if(type(data) == List):
-                for e in range(len(data)):
-                    if(data[e].id == record.key):
-                        wanted_data = data[e]
+            if(type(record) == List):
+                for e in range(len(record)):
+                    if(record[e].id == record.key):
+                        wanted_data = record[e]
             else:
-                wanted_data = data
+                wanted_data = record
             return wanted_data
 
     def select_many(self, list_of_keys: List[int]) -> List[dict]:

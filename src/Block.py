@@ -1,10 +1,15 @@
 from Record import Record
+from Base import Loader
 
 
-class Block:
+class Block(Loader):
     def __init__(self, buffer=""):
-        self.records = [Record(content=record, size=len(record))
-                        for record in buffer.split("\n")[:-1]]
+        self.records = []
+        offset = 0
+        for record in buffer.split('\n')[:-1]:
+            new_rec = Record(offset, record)
+            self.records.append(new_rec)
+            offset += new_rec.size
 
     def __offset_to_ix(self, offset):
         """
@@ -51,7 +56,7 @@ class Block:
         return self.records[ix]
 
     def __append(self, record):
-        if self.size + record.size > BLOCK_SIZE:
+        if self.size + record.size > self.BLOCK_SIZE:
             raise Exception('[ERROR] Block size exceeded')
         self.records.append(record)
 
