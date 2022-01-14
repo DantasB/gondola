@@ -20,5 +20,5 @@ class Schema:
 
     def metadata(self):
         meta = "$".join([column.metadata() for column in self.columns])
-        meta = f"{self.record_size}${meta}"
+        meta = f"{self.record_size}${meta}"+'\n'
         return meta

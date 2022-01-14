@@ -1,5 +1,5 @@
 class Record:
-    def __init__(self, offset, content='', size=0):
+    def __init__(self,  content='', offset=None, size=0):
         self.offset = offset
         self.content = content
         if len(content) > 0:

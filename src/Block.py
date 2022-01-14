@@ -7,7 +7,7 @@ class Block(Loader):
         self.records = []
         offset = 0
         for record in buffer.split('\n')[:-1]:
-            new_rec = Record(offset, record)
+            new_rec = Record(record, offset)
             self.records.append(new_rec)
             offset += new_rec.size
 
@@ -31,7 +31,7 @@ class Block(Loader):
         """
         ix = self.__offset_to_ix(offset)
         old = self.records[ix]
-        self.records[ix] = Record(size=old.size)
+        self.records[ix] = Record(offset=offset, size=old.size)
 
     def to_string(self):
         return '\n'.join([record.to_string() for record in self.records]) + '\n'
@@ -41,6 +41,8 @@ class Block(Loader):
             Chama update para substituir record no offset por outro
         """
         ix = self.__offset_to_ix(offset)
+        if not record.offset:
+            record.offset = offset
         if len(self.record) == ix:
             # se offset for igual ao ultimo byte tentamos append
             self.__append(record)
@@ -73,7 +75,8 @@ class Block(Loader):
         if old.size > record.size:
             if len(self.records) == ix - 1:
                 self.__append(
-                    Record(size=old.size-record.size))
-            self.records[ix + 1] = Record(size=old.size-record.size)
+                    Record(offset=offset, size=old.size-record.size))
+            self.records[ix + 1] = Record(offset=offset +
+                                          record.size, size=old.size - record.size)
             return offset + old.size, old.size-record.size
         return 'No new empty'
