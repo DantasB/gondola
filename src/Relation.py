@@ -31,7 +31,7 @@ class Relation:
         self.fileOrg.insert(Record(data))
 
     def select(self, filter=["all", "in", "between"]):
-        self.fileOrg.select(filter)
+        return self.fileOrg.select(filter)
 
     def delete(self, filter=["where", "all"]):
         self.fileOrg.delete(filter)

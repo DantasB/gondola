@@ -15,8 +15,11 @@ def validate_heap():
         }
     }
     relation = Relation(fileOrg, name, column_defs)
-    record_data = ('555, "lauzudo"')
+    record_data = ('123|"bauzudo"')
     relation.insert(record_data)
+    relation.delete(lambda r: r[0] == '221')
+
+    relation.fileOrg.persist()
 
 
 def main():

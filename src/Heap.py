@@ -1,3 +1,4 @@
+from hashlib import new
 from FileOrg import FileOrg
 from Schema import Schema
 from Block import Block
@@ -11,16 +12,17 @@ class Heap(FileOrg):
 
     def insert(self, record):
         if len(self.empty_list) > 0:
-            ix, offset = self.empty_list[-1]
+            ix, offset = self.empty_list.pop()
             block = self.read_block(ix)
-            block.write(offset, record)
+            new_empty = block.write(offset, record)
             self.write_block(block, ix)
-            self.empty_list.pop()
+            if new_empty != None:
+                self.empty_list.append((ix, new_empty[0]))
         else:
             new_block = Block()
-            new_block.records.append(record)
+            new_block.write(0, record)
             self.append_block(new_block)
-            self.empty_list.append((self.block_count, record.size))
+            self.empty_list.append((self.block_count-1, record.size))
         self.record_count += 1
 
     def reorganize(self):

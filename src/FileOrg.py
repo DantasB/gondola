@@ -1,5 +1,5 @@
 from Base import Loader
-import Block
+from Block import Block
 import os
 
 
@@ -22,7 +22,7 @@ class FileOrg(Loader):
         self.record_count = int(self.metadata_file.readline())
 
     def __empty_list_to_str(self):
-        return '|'.join([','.join(map(str, value)) for value in self.empty_list])
+        return '|'.join([','.join(map(str, value)) for value in self.empty_list])+'\n'
 
     def select(self, filter):
         r = []
@@ -33,7 +33,7 @@ class FileOrg(Loader):
             except:
                 break
             for record in block.records:
-                if filter(record):
+                if not record.is_empty and filter(record):
                     r.append(record)
             ix += 1
         return r
@@ -46,7 +46,7 @@ class FileOrg(Loader):
             except:
                 break
             for record in block.records:
-                if filter(record):
+                if not record.is_empty and filter(record):
                     block.clear(record.offset)
                     self.empty_list.append((ix, record.offset))
             self.write_block(block, ix)
@@ -83,7 +83,7 @@ class FileOrg(Loader):
     def persist(self):
         lines = []
         lines.append(self.__empty_list_to_str())
-        lines.append(self.block_count + "\n")
-        lines.append(self.record_count + '\n')
+        lines.append(str(self.block_count) + "\n")
+        lines.append(str(self.record_count) + '\n')
         self.metadata_file.seek(0)
         self.metadata_file.writelines(lines)

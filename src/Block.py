@@ -1,3 +1,4 @@
+from os import set_inheritable
 from Record import Record
 from Base import Loader
 
@@ -6,10 +7,15 @@ class Block(Loader):
     def __init__(self, buffer=""):
         self.records = []
         offset = 0
+        size = 0
         for record in buffer.split('\n')[:-1]:
             new_rec = Record(record, offset)
-            self.records.append(new_rec)
-            offset += new_rec.size
+            self.__append(new_rec)
+            size += new_rec.size
+            offset += size
+        if size < self.BLOCK_SIZE:
+            self.__append(
+                Record(offset=offset, size=self.BLOCK_SIZE - size))
 
     def __offset_to_ix(self, offset):
         """
@@ -20,9 +26,7 @@ class Block(Loader):
         for i, record in enumerate(self.records):
             sum += record.size
             if sum - 1 >= offset:
-                return i-1
-        if sum == offset:
-            return i + 1
+                return i
         raise Exception('[ERROR] Invalid Offset')
 
     def clear(self, offset):
@@ -40,15 +44,9 @@ class Block(Loader):
         """
             Chama update para substituir record no offset por outro
         """
-        ix = self.__offset_to_ix(offset)
         if not record.offset:
             record.offset = offset
-        if len(self.record) == ix:
-            # se offset for igual ao ultimo byte tentamos append
-            self.__append(record)
-        else:
-            return self.update(offset, record)
-        return 'No new empty'
+        return self.update(offset, record)
 
     def read(self, offset):
         """
@@ -58,8 +56,6 @@ class Block(Loader):
         return self.records[ix]
 
     def __append(self, record):
-        if self.size + record.size > self.BLOCK_SIZE:
-            raise Exception('[ERROR] Block size exceeded')
         self.records.append(record)
 
     def update(self, offset, record):
@@ -73,10 +69,8 @@ class Block(Loader):
         old = self.records[ix]
         self.records[ix] = record
         if old.size > record.size:
-            if len(self.records) == ix - 1:
-                self.__append(
-                    Record(offset=offset, size=old.size-record.size))
-            self.records[ix + 1] = Record(offset=offset +
-                                          record.size, size=old.size - record.size)
-            return offset + old.size, old.size-record.size
-        return 'No new empty'
+            self.records.insert(
+                ix+1, Record(offset=old.offset + record.size, size=old.size-record.size))
+            return old.offset + record.size, old.size-record.size
+        elif old.size < record.size:
+            raise Exception('[ERROR] Cant exceed block size')
