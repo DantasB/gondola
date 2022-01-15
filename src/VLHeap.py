@@ -17,9 +17,12 @@ class VLHeap(FileOrg):
     def insert(self, record):
         try:
             ix, offset = self.__findEmpty(record.size)
-            offset, size = self.write_record(ix, offset, record)
-            self.empty_list.append((ix, offset, size))
-        except:
+            new_empty = self.write_record(ix, offset, record)
+            if new_empty != None:
+                offset, size = new_empty
+                self.empty_list.append((ix, offset, size))
+        except Exception as e:
+            print(e)
             new_block = Block()
             new_block.write(0, record)
             self.append_block(new_block)
