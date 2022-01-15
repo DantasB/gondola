@@ -6,20 +6,21 @@ import os
 class FileOrg(Loader):
     def __init__(self, relation_name, schema_header=None):
         data_path = f"./src/{relation_name}/data.cbd"
-        metadata_path = f"./src/{relation_name}/metadata.cbd"
+        self.metadata_path = f"./src/{relation_name}/metadata.cbd"
         self.data_file = self.load_file(data_path)
-        self.metadata_file = self.load_file(metadata_path)
+        metadata_file = self.load_file(self.metadata_path)
         if schema_header:
             self.data_file.write(schema_header)
-        if len(self.metadata_file.readlines()) <= 1:
-            self.metadata_file.write('\n')  # emptylist
-            self.metadata_file.write('0\n')  # block_count
-            self.metadata_file.write('0\n')  # record_count
-            self.metadata_file.flush()
-        self.metadata_file.seek(0)
-        self.empty_list = self.load_empty_list(self.metadata_file)
-        self.block_count = int(self.metadata_file.readline())
-        self.record_count = int(self.metadata_file.readline())
+        if len(metadata_file.readlines()) <= 1:
+            metadata_file.write('\n')  # emptylist
+            metadata_file.write('0\n')  # block_count
+            metadata_file.write('0\n')  # record_count
+            metadata_file.flush()
+        metadata_file.seek(0)
+        self.empty_list = self.load_empty_list(metadata_file)
+        self.block_count = int(metadata_file.readline())
+        self.record_count = int(metadata_file.readline())
+        metadata_file.close()
 
     def __empty_list_to_str(self):
         return '|'.join([','.join(map(str, value)) for value in self.empty_list])+'\n'
@@ -81,9 +82,11 @@ class FileOrg(Loader):
         return new_empty
 
     def persist(self):
+        metadata_file = open(self.metadata_path, 'w')
         lines = []
         lines.append(self.__empty_list_to_str())
         lines.append(str(self.block_count) + "\n")
         lines.append(str(self.record_count) + '\n')
-        self.metadata_file.seek(0)
-        self.metadata_file.writelines(lines)
+        metadata_file.seek(0)
+        metadata_file.writelines(lines)
+        metadata_file.close()

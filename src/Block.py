@@ -44,8 +44,7 @@ class Block(Loader):
         """
             Chama update para substituir record no offset por outro
         """
-        if not record.offset:
-            record.offset = offset
+        record.offset = offset
         return self.update(offset, record)
 
     def read(self, offset):

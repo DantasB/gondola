@@ -3,7 +3,7 @@ from Relation import Relation
 
 def validate_heap():
     name = "Amigos"
-    fileOrg = "VLHeap"
+    fileOrg = "Heap"
     column_defs = {
         "id": {
             "type": "int",
@@ -15,11 +15,11 @@ def validate_heap():
         }
     }
     relation = Relation(fileOrg, name, column_defs)
-    record_data = ('1231|"bauzudo"')
+    record_data = ('123|"bauzudo"')
     relation.insert(record_data)
-    relation.delete(lambda r: r[0] == '221')
 
     relation.fileOrg.persist()
+    # relation.fileOrg.heap.persist()
 
 
 def main():

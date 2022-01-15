@@ -7,7 +7,7 @@ from copy import deepcopy
 class Ordered(FileOrg):
     def __init__(self, relation_name, schema_header):
         super().__init__(relation_name, schema_header)
-        self.heap = Heap(relation_name + '_extension', one_file=True)
+        self.heap = Heap(relation_name + '_extension', schema_header)
 
         self.need_reorganize = False
 
@@ -75,7 +75,6 @@ class Ordered(FileOrg):
     def insert(self, record):
         # adições serão feitas de maneira indiscriminada (não serão reorganizadas no momento chave)
         self.heap.insert(record)
-        self.heap.record_count += 1
 
     def __merge_sort(self, records, order_field):
         if(len(records) == 1):

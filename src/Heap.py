@@ -7,7 +7,7 @@ from Block import Block
 
 
 class Heap(FileOrg):
-    def __init__(self, relation_name, schema_header):
+    def __init__(self, relation_name, schema_header=None):
         super().__init__(relation_name, schema_header)
 
     def insert(self, record):
