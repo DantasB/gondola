@@ -3,12 +3,12 @@ class Record:
         self.offset = offset
         self.is_empty = True
         self.size = size
-
         if len(content) > 0:
             self.size = len(content.encode('utf-8')) + 1
             if content[0] != '\0':
                 self.content = content
                 self.attributes = content.split('|')
+                self.id = int(self.attributes[0])
                 self.is_empty = False
 
     def __getitem__(self, key):
