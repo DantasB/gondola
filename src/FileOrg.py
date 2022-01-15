@@ -7,6 +7,7 @@ class FileOrg(Loader):
     def __init__(self, relation_name, schema_header=None):
         data_path = f"./src/{relation_name}/data.cbd"
         self.metadata_path = f"./src/{relation_name}/metadata.cbd"
+        self.already_existed = True if os.path.exists(data_path) else False
         self.data_file = self.load_file(data_path)
         metadata_file = self.load_file(self.metadata_path)
         if schema_header:
@@ -17,7 +18,7 @@ class FileOrg(Loader):
             metadata_file.write('0\n')  # record_count
             metadata_file.flush()
         metadata_file.seek(0)
-        self.empty_list = self.load_empty_list(metadata_file)
+        self.empty_list = self.load_list(metadata_file.readline())
         self.block_count = int(metadata_file.readline())
         self.record_count = int(metadata_file.readline())
         metadata_file.close()

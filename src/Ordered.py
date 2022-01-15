@@ -1,66 +1,75 @@
+from tracemalloc import start
 from FileOrg import FileOrg
 from Block import Block
 from Heap import Heap
-from copy import deepcopy
 
 
 class Ordered(FileOrg):
     def __init__(self, relation_name, schema_header):
         super().__init__(relation_name, schema_header)
         self.heap = Heap(relation_name + '_extension', schema_header)
+        if not self.already_existed:
+            f = open(self.metadata_path, 'a')
+            f.write('\n')
+            f.close()
+        f = open(self.metadata_path, 'r')
+        id_list = f.readlines()[-1].strip('\n').split('|')
+        if id_list[0] != '':
+            self.id_list = [int(id) for id in id_list]
+        else:
+            self.id_list = []
+        f.close()
 
         self.need_reorganize = False
 
-    def search_index(self, index):
+    def delete(self, id):
+        if filter:
+            super().delete(lambda r: r.id == id)
+        else:
+            self.id_list.remove(id)
+
+    def __search_index(self, index):
         if self.need_reorganize:
             self.reorganize()
         block_ix = int(index/self.RECORDS_IN_A_BLOCK)
         block_offset = (index % self.RECORDS_IN_A_BLOCK) * self.RECORD_SIZE
-        block = super().read_block(block_ix)
-        return block_ix, block.read(block_offset)
+        return block_ix, block_offset
 
     def __binary_search(self, id, start=0, end=None):
+        # https://www.geeksforgeeks.org/python-program-for-binary-search/
         if end == None:
-            end = self.record_count-1
-        if end - start < 1:
-            for i in range(start, end+1):
-                ix, p_record = self.search_index(i)
-                p_id = p_record.id
-                if id == p_record.id:
-                    return ix, p_record
-            raise Exception('[ERROR] Couldnt find record')
+            end = len(self.id_list) - 1
 
-        p = int((end - start)/2 + start)
-        p_record = self.search_index(p)
-        p_id = p_record.id
-        if id == p_id:
-            return p_record
-        elif id < p_id:
-            return self.__binary_search(id, start, p-1)
+        # Check base case
+        if end >= start:
+
+            mid = (end + start) // 2
+
+            # If element is present at the middle itself
+            if self.id_list[mid] == id:
+                return self.__search_index(mid)
+
+            # If element is smaller than mid, then it can only
+            # be present in left subarray
+            elif self.id_list[mid] > id:
+                return self.__binary_search(id, start, mid - 1)
+
+            # Else the element can only be present in right subarray
+            else:
+                return self.__binary_search(id, mid + 1, end)
+
         else:
-            return self.__binary_search(id, p+1, end)
+            # Element is not present in the array
+            raise Exception('[ERROR] Couldnt find ID')
 
     def select_range(self, first_id, last_id):
-        if self.need_reorganize:
-            self.reorganize()
-        r = []
-        if first_id > self.record_count-1:
-            first_id = self.record_count
-        if last_id > self.record_count-1:
-            last_id = self.record_count
-        first_ix, _ = self.__binary_search(first_id)
-        last_ix, _ = self.__binary_search(last_id)
-
-        for ix in range(first_ix, last_ix + 1):
-            block = super().read_block(ix)
-            for record in block.records:
-                if record.id >= first_id and record.id <= last_id:
-                    r.append(record)
+        # como fazer??
+        pass
 
     def select_id(self, id):
         if self.need_reorganize:
             self.reorganize()
-        return self.__binary_search(id)[1]
+        return self.__binary_search(id)
 
     def select_list(self, filter_list):
         r = []
@@ -75,6 +84,13 @@ class Ordered(FileOrg):
     def insert(self, record):
         # adições serão feitas de maneira indiscriminada (não serão reorganizadas no momento chave)
         self.heap.insert(record)
+        self.id_list.append(record.id)
+
+    def persist(self):
+        super().persist()
+        f = open(self.metadata_path, 'a')
+        stringfied = [str(id) for id in self.id_list]
+        f.write('|'.join(stringfied) + '\n')
 
     def __merge_sort(self, records, order_field):
         if(len(records) == 1):

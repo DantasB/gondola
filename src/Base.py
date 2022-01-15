@@ -14,8 +14,8 @@ class Loader:
         f = open(file_path, "r+")
         return f
 
-    def load_empty_list(self, file):
-        tuples = file.readline().rstrip('\n').split('|')
+    def load_list(self, line):
+        tuples = line.rstrip('\n').split('|')
         if tuples[0] != '':
             return [tuple(map(int, t.split(','))) for t in tuples]
         else:
