@@ -3,8 +3,9 @@ from Hash import Hash
 from Ordered import Ordered
 from Schema import Schema
 from Record import Record
+from VLHeap import VLHeap
 
-fileOrgs = {"Heap": Heap, "Hash": Hash, "Ordered": Ordered}
+fileOrgs = {"VLHeap": VLHeap, "Heap": Heap, "Hash": Hash, "Ordered": Ordered}
 
 
 class Relation:

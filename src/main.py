@@ -3,7 +3,7 @@ from Relation import Relation
 
 def validate_heap():
     name = "Amigos"
-    fileOrg = "Heap"
+    fileOrg = "VLHeap"
     column_defs = {
         "id": {
             "type": "int",

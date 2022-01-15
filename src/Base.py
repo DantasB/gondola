@@ -2,10 +2,10 @@ import os
 
 
 class Loader:
-    BLOCK_SIZE = 500
+    BLOCK_SIZE = 42
     HEADER_SIZE = 31
-    RECORDS_IN_A_BLOCK = 20
-    RECORD_SIZE = 20
+    RECORDS_IN_A_BLOCK = 3
+    RECORD_SIZE = 14
 
     def load_file(self, file_path):
         if not os.path.exists(file_path):
