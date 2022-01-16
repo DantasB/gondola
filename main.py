@@ -1,113 +1,126 @@
 from src.structures.relation import Relation
 
+data_file = open('./input/data.csv', 'r')
+file_lines = data_file.readlines()
+
+
+def populate_relation(relation: Relation):
+    for file_line in file_lines:
+        """
+        id 1 até 2022
+        """
+        data = file_line.strip('\n').split('|')
+        data[0] = data[0].rjust(20, '0')
+        data[1] = data[1].ljust(20, ' ')
+        data[2] = data[2].ljust(20, ' ')
+        relation.insert(file_line.strip('\n'))
+
+
+def populate_relation_vlheap(relation: Relation):
+    for file_line in file_lines[:100]:
+        relation.insert(file_line.strip('\n'))
+
 
 def validate_heap():
-    name = "Amigos"
+    name = "ZodiacoHeap"
     fileOrg = "Heap"
     column_defs = {
         "id": {
             "type": "int",
-            "size": 10
+            "size": 20
         },
         "nome": {
             "type": "varchar",
-            "size": 255
+            "size": 20
+        },
+        "zodiaco": {
+            "type": "varchar",
+            "size": 20
         }
     }
+
     relation = Relation(fileOrg, name, column_defs)
-    record_data = ('222|"bernado"')
-    relation.insert(record_data)
-    record_data = ('423|"bauzudo"')
-    relation.insert(record_data)
-    record_data = ('122|"Joao"')
-    relation.insert(record_data)
-    relation.delete(lambda r: r.id == 423)
+    populate_relation(relation)
+    relation.delete(lambda r: int(r.id) == 423)
     relation.fileOrg.reorganize()
     relation.fileOrg.persist()
 
 
 def validate_vlheap():
-    name = "AmigosVL"
+    name = "ZodiacoVL"
     fileOrg = "VLHeap"
     column_defs = {
         "id": {
             "type": "int",
-            "size": 10
+            "size": 20
         },
         "nome": {
             "type": "varchar",
-            "size": 255
+            "size": 20
+        },
+        "zodiaco": {
+            "type": "varchar",
+            "size": 20
         }
     }
     relation = Relation(fileOrg, name, column_defs)
-    record_data = ('222|"bernado"')
-    relation.insert(record_data)
-    record_data = ('423|"bauzudo"')
-    relation.insert(record_data)
-    record_data = ('122|"Joao"')
-    relation.insert(record_data)
-    relation.delete(lambda r: r.id == 423)
+    populate_relation_vlheap(relation)
+    relation.delete(lambda r: int(r.id) == 423)
     relation.fileOrg.persist()
 
 
 def validate_ordered():
-    name = "AmigosOrdered"
+    name = "ZodiacoOrdered"
     fileOrg = "Ordered"
     column_defs = {
         "id": {
             "type": "int",
-            "size": 10
+            "size": 20
         },
         "nome": {
             "type": "varchar",
-            "size": 255
+            "size": 20
+        },
+        "zodiaco": {
+            "type": "varchar",
+            "size": 20
         }
     }
     relation = Relation(fileOrg, name, column_defs)
-    record_data = ('222|"bernado"')
-    relation.insert(record_data)
-    record_data = ('423|"bauzudo"')
-    relation.insert(record_data)
-    record_data = ('122|"Joao"')
-    relation.insert(record_data)
-    relation.delete(lambda r: r.id == 423)
+    populate_relation(relation)
+    relation.delete(lambda r: int(r.id) == 423)
     relation.fileOrg.persist()
 
 
 def validate_hash():
-    name = "AmigosHash"
+    name = "ZodiacoHash"
     fileOrg = "Hash"
     column_defs = {
         "id": {
             "type": "int",
-            "size": 10
+            "size": 20
         },
         "nome": {
             "type": "varchar",
-            "size": 255
+            "size": 20
+        },
+        "zodiaco": {
+            "type": "varchar",
+            "size": 20
         }
     }
+
     relation = Relation(fileOrg, name, column_defs, bucket_size=3)
-    record_data = ('1|"bernado"')
-    relation.insert(record_data)
-    record_data = ('4|"asdasd"')
-    relation.insert(record_data)
-    record_data = ('5|"lima"')
-    relation.insert(record_data)
-    record_data = ('10|"bergmonta"')
-    record_data = ('2|"bauzudo"')
-    relation.insert(record_data)
-    record_data = ('3|"Joao"')
-    relation.insert(record_data)
-    relation.delete(lambda r: r.id == 2)
+    populate_relation(relation)
+    relation.delete(lambda r: int(r.id) == 2)
     relation.fileOrg.persist()
 
 
 def main():
-    validate_heap()
+    # validate_heap()
     validate_vlheap()
-    validate_ordered()
-    validate_hash()
+    # validate_ordered()
+    # validate_hash()
     return
 
 

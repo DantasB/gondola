@@ -1,9 +1,6 @@
 from src.structures.file_org import FileOrg
-from typing import List
-
 from src.structures.block import Block
 from src.structures.record import Record
-
 
 
 class Hash(FileOrg):
@@ -31,18 +28,8 @@ class Hash(FileOrg):
         for _ in range(n_blocks):
             self.append_block(Block())
 
-    def insert_overflow(self, bucket, record):
-        for i, b in enumerate(self.overflow_list):
-            if b == bucket:
-                try:
-                    self.insert_bucket(i + self.ALLOCATED_BUCKETS + 1, record)
-                except:
-                    pass
-        # need new overflow
-
-    def insert(self, record) -> None:
-        bucket = self.hashing(record.id)
-        first_block_ix = bucket * self.blocks_in_a_bucket
+    def insert_bucket(self, ix, record):
+        first_block_ix = ix * self.blocks_in_a_bucket
         if first_block_ix >= self.block_count:
             self.fill(first_block_ix-self.block_count + 1)
         for i in range(self.blocks_in_a_bucket):
@@ -53,33 +40,100 @@ class Hash(FileOrg):
                 return
             except:
                 pass
-        raise Exception('Needs Bucket Overflow')
+        raise Exception('Need Overflow')
+
+    def search_bucket(self, ix, record):
+        first_block_ix = ix * self.blocks_in_a_bucket
+        if first_block_ix >= self.block_count:
+            raise Exception('Empty Bucket')
+        for i in range(self.blocks_in_a_bucket):
+            b = self.read_block(first_block_ix + i)
+            for recovered_record in b.records:
+                if(int(record.id) == recovered_int(record.id)):
+                    return recovered_record
+        raise Exception('Need Overflow')
+
+    def delete_bucket(self, ix, record):
+        first_block_ix = ix * self.blocks_in_a_bucket
+        if first_block_ix >= self.block_count:
+            raise Exception('Empty Bucket')
+        for i in range(self.blocks_in_a_bucket):
+            b = self.read_block(first_block_ix + i)
+            for recovered_record in b.records:
+                if(int(record.id) == recovered_int(record.id)):
+                    b.clear(recovered_record.offset)
+                    return
+        raise Exception('Need Overflow')
+
+    def search_overflow(self, bucket, record):
+        for i, b in enumerate(self.overflow_list):
+            if b == bucket:
+                try:
+                    self.search_bucket(i + self.ALLOCATED_BUCKETS + 1, record)
+                    return
+                except:
+                    pass
+        raise Exception('Cant find record')
+
+    def insert_overflow(self, bucket, record):
+        for i, b in enumerate(self.overflow_list):
+            if b == bucket:
+                try:
+                    self.insert_bucket(i + self.ALLOCATED_BUCKETS + 1, record)
+                    return
+                except:
+                    pass
+        self.overflow_list.append(bucket)
+        self.insert_overflow(bucket, record)
+
+    def delete_overflow(self, bucket, record):
+        for i, b in enumerate(self.overflow_list):
+            if b == bucket:
+                try:
+                    self.delete_bucket(i + self.ALLOCATED_BUCKETS + 1, record)
+                    return
+                except:
+                    pass
+        raise Exception('Cant find record')
+
+    def insert(self, record) -> None:
+        bucket = self.hashing(int(record.id))
+        try:
+            self.insert_bucket(bucket, record)
+        except:
+            self.insert_overflow(bucket, record)
 
     def select_one(self, record):
-        bucket = self.hashing(record.id)
-        first_block_ix = bucket * self.blocks_in_a_bucket
-        for i in range(self.blocks_in_a_bucket):
-            b = self.read_block(first_block_ix + i)
-            for recovered_record in b.records:
-                if(record.id == recovered_record.id):
-                    return recovered_record
-        raise Exception('[ERROR] Cant find record')
-
-    def select_many(self, list_of_records: List[Record]) -> List[Record]:
-        selected = []
-        for record in list_of_records:
-            selected.append[self.select_one(record.id)]
-        return selected
-
-    def select_range(self, starting_record: Record, ending_record: Record) -> List[Record]:
-        return self.select(lambda r: (r.id >= starting_record.id) and (r.id <= ending_record.id))
+        bucket = self.hashing(int(record.id))
+        try:
+            self.search_bucket(bucket, record)
+        except:
+            self.search_overflow(bucket, record)
 
     def delete(self, record: Record) -> None:
-        bucket = self.hashing(record.id)
-        first_block_ix = bucket * self.blocks_in_a_bucket
-        for i in range(self.blocks_in_a_bucket):
-            b = self.read_block(first_block_ix + i)
-            for recovered_record in b.records:
-                if(record.id == recovered_record.id):
-                    del recovered_record
-        raise Exception('[ERROR] Cant find and delete record')
+        bucket = self.hashing(int(record.id))
+        try:
+            self.delete_bucket(bucket, record)
+        except:
+            self.delete_overflow(bucket, record)
+
+    def select_list(self, list_of_records):
+        selected = []
+        for record in list_of_records:
+            selected.append[self.select_one(int(record.id))]
+        return selected
+
+    def persist(self):
+        self.heap.persist()
+        metadata_file = open(self.metadata_path, 'w')
+        lines = []
+        lines.append(self.empty_list_to_str())
+        lines.append(str(self.block_count) + "\n")
+        lines.append(str(self.record_count) + '\n')
+        lines.append(str(self.need_reorganize) + '\n')
+        metadata_file.seek(0)
+        metadata_file.writelines(lines)
+        metadata_file.close()
+        f = open(self.metadata_path, 'a')
+        stringfied = [str(id) for id in self.overflow_list]
+        f.write('|'.join(stringfied) + '\n')

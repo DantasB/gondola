@@ -23,7 +23,7 @@ class Ordered(FileOrg):
     def delete(self, id):
         self.need_reorganize = True
         if filter:
-            super().delete(lambda r: r.id == id)
+            super().delete(lambda r: int(r.id) == id)
         else:
             self.id_list.remove(id)
         self.reorganize()
@@ -85,7 +85,7 @@ class Ordered(FileOrg):
         self.need_reorganize = True
         # adições serão feitas de maneira indiscriminada (não serão reorganizadas no momento chave)
         self.heap.insert(record)
-        self.id_list.append(record.id)
+        self.id_list.append(int(record.id))
         self.id_list.sort()
 
     def persist(self):

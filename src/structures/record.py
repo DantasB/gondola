@@ -8,7 +8,7 @@ class Record:
             if content[0] != "#":
                 self.content = content
                 self.attributes = content.split("|")
-                self.id = int(self.attributes[0])
+                self.id = self.attributes[0]
                 self.is_empty = False
 
     def __getitem__(self, key):

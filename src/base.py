@@ -3,7 +3,7 @@ import os
 
 class Loader:
     BLOCK_SIZE = 42
-    HEADER_SIZE = 31
+    HEADER_SIZE = 48
     RECORDS_IN_A_BLOCK = 3
     RECORD_SIZE = 14
     BUCKET_SIZE = 84
