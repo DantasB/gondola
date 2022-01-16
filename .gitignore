@@ -14,4 +14,10 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+# Vscode archives
+.vscode/
+
+# Python cache files
 __pycache__/
+
+.env

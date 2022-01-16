@@ -1,5 +1,6 @@
-from FileOrg import FileOrg
-from Block import Block
+from src.structures.file_org import FileOrg
+from src.structures.block import Block
+
 
 class Heap(FileOrg):
     def __init__(self, relation_name, schema_header=None):
@@ -17,5 +18,5 @@ class Heap(FileOrg):
             new_block = Block()
             new_block.write(0, record)
             self.append_block(new_block)
-            self.empty_list.append((self.block_count-1, record.size))
+            self.empty_list.append((self.block_count - 1, record.size))
         self.record_count += 1

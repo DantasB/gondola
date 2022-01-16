@@ -1,6 +1,5 @@
-from os import set_inheritable
-from Record import Record
-from Base import Loader
+from src.structures.record import Record
+from src.base import Loader
 
 
 class Block(Loader):
@@ -8,14 +7,13 @@ class Block(Loader):
         self.records = []
         offset = 0
         size = 0
-        for record in buffer.split('\n')[:-1]:
+        for record in buffer.split("\n")[:-1]:
             new_rec = Record(record, offset)
             self.__append(new_rec)
             size += new_rec.size
             offset += size
         if size < self.BLOCK_SIZE:
-            self.__append(
-                Record(offset=offset, size=self.BLOCK_SIZE - size))
+            self.__append(Record(offset=offset, size=self.BLOCK_SIZE - size))
 
     def __offset_to_ix(self, offset):
         """
@@ -27,22 +25,22 @@ class Block(Loader):
             sum += record.size
             if sum - 1 >= offset:
                 return i
-        raise Exception('[ERROR] Invalid Offset')
+        raise Exception("[ERROR] Invalid Offset")
 
     def clear(self, offset):
         """
-            Substitui o record no offset por um outro vazio de mesmo tamanho
+        Substitui o record no offset por um outro vazio de mesmo tamanho
         """
         ix = self.__offset_to_ix(offset)
         old = self.records[ix]
         self.records[ix] = Record(offset=offset, size=old.size)
 
     def to_string(self):
-        return '\n'.join([record.to_string() for record in self.records]) + '\n'
+        return "\n".join([record.to_string() for record in self.records]) + "\n"
 
     def write(self, offset, record):
         """
-            Chama update para substituir record no offset por outro
+        Chama update para substituir record no offset por outro
         """
         record.offset = offset
         return self.update(offset, record)
@@ -65,7 +63,7 @@ class Block(Loader):
         raise Exception('Cant fit inside block')
 
     def update(self, offset, record):
-        """"
+        """ "
         Substitui um record no offset por outro
         Se o novo record for menor que o anterior, cria um record vazio
         com o tamanho do buraco que ficou no arquivo
@@ -76,7 +74,9 @@ class Block(Loader):
         self.records[ix] = record
         if old.size > record.size:
             self.records.insert(
-                ix+1, Record(offset=old.offset + record.size, size=old.size-record.size))
-            return old.offset + record.size, old.size-record.size
+                ix + 1,
+                Record(offset=old.offset + record.size, size=old.size - record.size),
+            )
+            return old.offset + record.size, old.size - record.size
         elif old.size < record.size:
-            raise Exception('[ERROR] Cant exceed block size')
+            raise Exception("[ERROR] Cant exceed block size")

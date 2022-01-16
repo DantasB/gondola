@@ -1,9 +1,9 @@
-import enum
-from shutil import ExecError
-from FileOrg import FileOrg
-from Block import Block
-from Record import Record
+from src.structures.file_org import FileOrg
 from typing import List
+
+from src.structures.block import Block
+from src.structures.record import Record
+
 
 
 class Hash(FileOrg):

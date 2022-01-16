@@ -1,4 +1,4 @@
-from Relation import Relation
+from src.structures.relation import Relation
 
 
 def validate_heap():
@@ -105,9 +105,9 @@ def validate_hash():
 
 def main():
     validate_heap()
-    # validate_vlheap()
-    # validate_ordered()
-    # validate_hash()
+    validate_vlheap()
+    validate_ordered()
+    validate_hash()
     return
 
 

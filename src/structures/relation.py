@@ -1,9 +1,9 @@
-from Heap import Heap
-from Hash import Hash
-from Ordered import Ordered
-from Schema import Schema
-from Record import Record
-from VLHeap import VLHeap
+from src.organizations.heap import Heap
+from src.organizations.hash import Hash
+from src.organizations.ordered_archive import Ordered
+from src.structures.schema import Schema
+from src.structures.record import Record
+from src.organizations.variable_heap import VLHeap
 
 fileOrgs = {"VLHeap": VLHeap, "Heap": Heap, "Hash": Hash, "Ordered": Ordered}
 
@@ -26,7 +26,8 @@ class Relation:
         """
         self.schema = Schema(relation_name=name, column_defs=column_defs)
         self.fileOrg = fileOrgs[fileOrg](
-            relation_name=name, schema_header=self.schema.metadata(), **kwargs)
+            relation_name=name, schema_header=self.schema.metadata(), **kwargs
+        )
 
     def insert(self, data):
         self.fileOrg.insert(Record(data))

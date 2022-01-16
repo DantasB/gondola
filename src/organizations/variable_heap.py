@@ -1,5 +1,6 @@
-from FileOrg import FileOrg
-from Block import Block
+from src.structures.file_org import FileOrg
+from src.structures.block import Block
+
 # Variable attribute length Heap
 
 
@@ -13,7 +14,7 @@ class VLHeap(FileOrg):
                 del self.empty_list[i]
                 return (ix, offset)
 
-        raise Exception('[WARN] Cant find fitting empty slot')
+        raise Exception("[WARN] Cant find fitting empty slot")
 
     def insert(self, record):
         try:
@@ -28,7 +29,7 @@ class VLHeap(FileOrg):
             new_block.write(0, record)
             self.append_block(new_block)
             self.empty_list.append(
-                (self.block_count-1, record.size, self.BLOCK_SIZE - record.size)
+                (self.block_count - 1, record.size, self.BLOCK_SIZE - record.size)
             )
         self.record_count += 1
 

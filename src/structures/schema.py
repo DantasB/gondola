@@ -1,4 +1,4 @@
-from Column import Column
+from src.structures.column import Column
 
 
 class Schema:
@@ -9,7 +9,9 @@ class Schema:
             column_info = column_defs[column_key]
             self.columns.append(
                 Column(
-                    name=column_key, column_type=column_info["type"], size=column_info["size"]
+                    name=column_key,
+                    column_type=column_info["type"],
+                    size=column_info["size"],
                 )
             )
 
@@ -20,5 +22,5 @@ class Schema:
 
     def metadata(self):
         meta = "$".join([column.metadata() for column in self.columns])
-        meta = f"{self.record_size}${meta}"+'\n'
+        meta = f"{self.record_size}${meta}" + "\n"
         return meta

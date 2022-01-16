@@ -1,13 +1,13 @@
-from Record import Record
-from Base import Loader
-from Block import Block
+from src.structures.record import Record
+from src.base import Loader
+from src.structures.block import Block
 import os
 
 
 class FileOrg(Loader):
     def __init__(self, relation_name, schema_header=None):
-        self.data_path = f"./src/Database/{relation_name}.data.cbd"
-        self.metadata_path = f"./src/Database/{relation_name}.metadata.cbd"
+        self.data_path = f"./database/{relation_name}.data.cbd"
+        self.metadata_path = f"./database/{relation_name}.metadata.cbd"
         self.already_existed = os.path.exists(self.data_path)
         self.data_file = self.load_file(self.data_path)
         metadata_file = self.load_file(self.metadata_path)
@@ -15,10 +15,10 @@ class FileOrg(Loader):
         if schema_header:
             self.data_file.write(schema_header)
         if len(metadata_file.readlines()) <= 1:
-            metadata_file.write('\n')  # emptylist
-            metadata_file.write('0\n')  # block_count
-            metadata_file.write('0\n')  # record_count
-            metadata_file.write('False\n')  # need_reorganize
+            metadata_file.write("\n")  # emptylist
+            metadata_file.write("0\n")  # block_count
+            metadata_file.write("0\n")  # record_count
+            metadata_file.write("False\n")  # need_reorganize
         metadata_file.seek(0)
         self.empty_list = self.load_list(metadata_file.readline())
         self.block_count = int(metadata_file.readline())
@@ -27,7 +27,7 @@ class FileOrg(Loader):
         metadata_file.close()
 
     def empty_list_to_str(self):
-        return '|'.join([','.join(map(str, value)) for value in self.empty_list])+'\n'
+        return "|".join([",".join(map(str, value)) for value in self.empty_list]) + "\n"
 
     def select(self, filter):
         r = []
@@ -90,11 +90,11 @@ class FileOrg(Loader):
         return new_empty
 
     def persist(self):
-        metadata_file = open(self.metadata_path, 'w')
+        metadata_file = open(self.metadata_path, "w")
         lines = []
         lines.append(self.empty_list_to_str())
         lines.append(str(self.block_count) + "\n")
-        lines.append(str(self.record_count) + '\n')
+        lines.append(str(self.record_count) + "\n")
         metadata_file.seek(0)
         metadata_file.writelines(lines)
         metadata_file.close()
@@ -106,10 +106,10 @@ class FileOrg(Loader):
 
     def metadata_clear(self):
         metadata_file = self.load_file(self.metadata_path)
-        metadata_file.write('\n')  # emptylist
-        metadata_file.write('0\n')  # block_count
-        metadata_file.write('0\n')  # record_count
-        metadata_file.write('False\n')  # need_reorganize
+        metadata_file.write("\n")  # emptylist
+        metadata_file.write("0\n")  # block_count
+        metadata_file.write("0\n")  # record_count
+        metadata_file.write("False\n")  # need_reorganize
         self.empty_list = []
         self.block_count = 0
         self.record_count = 0

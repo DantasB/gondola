@@ -1,6 +1,6 @@
-from FileOrg import FileOrg
-from Heap import Heap
-from Record import Record
+from src.structures.file_org import FileOrg
+from src.organizations.heap import Heap
+from src.structures.record import Record
 
 
 class Ordered(FileOrg):
