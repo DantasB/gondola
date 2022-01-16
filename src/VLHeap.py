@@ -12,13 +12,14 @@ class VLHeap(FileOrg):
             if r_size >= size:
                 del self.empty_list[i]
                 return (ix, offset)
-        raise Exception('[ERROR] Cant find fitting empty slot')
+
+        raise Exception('[WARN] Cant find fitting empty slot')
 
     def insert(self, record):
         try:
             ix, offset = self.__findEmpty(record.size)
             new_empty = self.write_record(ix, offset, record)
-            if new_empty != None:
+            if new_empty:
                 offset, size = new_empty
                 self.empty_list.append((ix, offset, size))
         except Exception as e:

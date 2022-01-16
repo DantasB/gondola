@@ -4,8 +4,6 @@ from Block import Block
 from Heap import Heap
 from Record import Record
 
-# TODO: salvar need_reorganize no metadata.cdb
-
 
 class Ordered(FileOrg):
     def __init__(self, relation_name, schema_header):
@@ -22,8 +20,6 @@ class Ordered(FileOrg):
         else:
             self.id_list = []
         f.close()
-
-        self.need_reorganize = False
 
     def delete(self, id):
         self.need_reorganize = True
@@ -92,7 +88,15 @@ class Ordered(FileOrg):
         self.id_list.append(record.id)
 
     def persist(self):
-        super().persist()
+        metadata_file = open(self.metadata_path, 'w')
+        lines = []
+        lines.append(self.empty_list_to_str())
+        lines.append(str(self.block_count) + "\n")
+        lines.append(str(self.record_count) + '\n')
+        lines.append(str(self.need_reorganize) + '\n')
+        metadata_file.seek(0)
+        metadata_file.writelines(lines)
+        metadata_file.close()
         f = open(self.metadata_path, 'a')
         stringfied = [str(id) for id in self.id_list]
         f.write('|'.join(stringfied) + '\n')

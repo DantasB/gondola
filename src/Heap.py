@@ -1,10 +1,5 @@
-from hashlib import new
 from FileOrg import FileOrg
-from Schema import Schema
 from Block import Block
-
-# TODO empty_list precisa ser um list, e não string
-
 
 class Heap(FileOrg):
     def __init__(self, relation_name, schema_header=None):

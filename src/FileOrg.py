@@ -6,10 +6,9 @@ import os
 
 class FileOrg(Loader):
     def __init__(self, relation_name, schema_header=None):
-        self.data_path = f"./src/{relation_name}/data.cbd"
-        self.metadata_path = f"./src/{relation_name}/metadata.cbd"
-        self.already_existed = True if os.path.exists(
-            self.data_path) else False
+        self.data_path = f"./src/Database/{relation_name}.data.cbd"
+        self.metadata_path = f"./src/Database/{relation_name}.metadata.cbd"
+        self.already_existed = os.path.exists(self.data_path)
         self.data_file = self.load_file(self.data_path)
         metadata_file = self.load_file(self.metadata_path)
         self.schema_header = schema_header
@@ -19,14 +18,16 @@ class FileOrg(Loader):
             metadata_file.write('\n')  # emptylist
             metadata_file.write('0\n')  # block_count
             metadata_file.write('0\n')  # record_count
+            metadata_file.write('False\n') # need_reorganize
             metadata_file.flush()
         metadata_file.seek(0)
         self.empty_list = self.load_list(metadata_file.readline())
         self.block_count = int(metadata_file.readline())
         self.record_count = int(metadata_file.readline())
+        self.need_reorganize = False
         metadata_file.close()
 
-    def __empty_list_to_str(self):
+    def empty_list_to_str(self):
         return '|'.join([','.join(map(str, value)) for value in self.empty_list])+'\n'
 
     def select(self, filter):
@@ -91,7 +92,7 @@ class FileOrg(Loader):
     def persist(self):
         metadata_file = open(self.metadata_path, 'w')
         lines = []
-        lines.append(self.__empty_list_to_str())
+        lines.append(self.empty_list_to_str())
         lines.append(str(self.block_count) + "\n")
         lines.append(str(self.record_count) + '\n')
         metadata_file.seek(0)
