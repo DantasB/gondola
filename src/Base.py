@@ -6,6 +6,8 @@ class Loader:
     HEADER_SIZE = 31
     RECORDS_IN_A_BLOCK = 3
     RECORD_SIZE = 14
+    BUCKET_SIZE = 84
+    ALLOCATED_BUCKETS = 10
 
     def load_file(self, file_path):
         if not os.path.exists(file_path):

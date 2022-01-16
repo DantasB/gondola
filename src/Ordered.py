@@ -13,7 +13,6 @@ class Ordered(FileOrg):
             f.close()
         f = open(self.metadata_path, 'r')
         f_lines = f.readlines()
-        self.need_reorganize = f_lines[-2].strip('\n') == 'True'
         id_list = f_lines[-1].strip('\n').split('|')
         if id_list[0] != '':
             self.id_list = [int(id) for id in id_list]

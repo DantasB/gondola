@@ -57,6 +57,13 @@ class Block(Loader):
     def __append(self, record):
         self.records.append(record)
 
+    def insert(self, record):
+        for r in self.records:
+            if r.is_empty and r.size >= record.size:
+                self.write(r.offset, record)
+                return
+        raise Exception('Cant fit inside block')
+
     def update(self, offset, record):
         """"
         Substitui um record no offset por outro

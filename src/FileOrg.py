@@ -23,7 +23,7 @@ class FileOrg(Loader):
         self.empty_list = self.load_list(metadata_file.readline())
         self.block_count = int(metadata_file.readline())
         self.record_count = int(metadata_file.readline())
-        self.need_reorganize = False
+        self.need_reorganize = metadata_file.readline().strip('\n') == 'True'
         metadata_file.close()
 
     def empty_list_to_str(self):
