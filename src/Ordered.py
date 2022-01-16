@@ -1,6 +1,4 @@
-from tracemalloc import start
 from FileOrg import FileOrg
-from Block import Block
 from Heap import Heap
 from Record import Record
 
@@ -14,7 +12,9 @@ class Ordered(FileOrg):
             f.write('\n')
             f.close()
         f = open(self.metadata_path, 'r')
-        id_list = f.readlines()[-1].strip('\n').split('|')
+        f_lines = f.readlines()
+        self.need_reorganize = f_lines[-2].strip('\n') == 'True'
+        id_list = f_lines[-1].strip('\n').split('|')
         if id_list[0] != '':
             self.id_list = [int(id) for id in id_list]
         else:
@@ -27,6 +27,7 @@ class Ordered(FileOrg):
             super().delete(lambda r: r.id == id)
         else:
             self.id_list.remove(id)
+        self.reorganize()
 
     def __search_index(self, index):
         if self.need_reorganize:
@@ -114,7 +115,7 @@ class Ordered(FileOrg):
 
     def __merge(self, records, start, mid, ending):
         left = records[start:mid]
-        right = records[mid:start]
+        right = records[mid:ending]
         i, j = 0, 0
         for k in range(start, ending):
             if(i >= len(left)):
@@ -133,22 +134,18 @@ class Ordered(FileOrg):
     def reorganize(self):
         self.need_reorganize = False
         # ler as entradas no arquivo de extensão
-        new_records = [new_rec for new_rec in self.heap.data_file.readlines()]
+        new_records = []
+        for new_rec in self.heap.data_file.readlines():
+            if new_rec.startswith('#'):
+                continue
+            new_records.append(Record(new_rec))
         # apagar tudo desse arquivo após ter recuperado a informação
         self.heap.reset()
-
         # pega os registros atuais (no arquivo original)
         main_records = self.select(lambda r: True)
-        new_records = self.heap.select(lambda r: True)
-
         self.reset()
-
         # id é apenas um exemplo de possibilidade de campo pelo qual ordenar
         sorted_records = self.__merge_sort(
             main_records + new_records)
-
         for record in sorted_records:
-            self.data_file.write(record.to_string()+'\n')
-
-        # retirar todos os records marcados como deletados
-        # fazer um merge sort com os registros que tenham sobrado
+            self.data_file.write(record.to_string())

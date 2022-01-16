@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from Record import Record
 from Base import Loader
 from Block import Block
 import os
@@ -40,7 +40,7 @@ class FileOrg(Loader):
                 break
             for record in block.records:
                 if not record.is_empty and filter(record):
-                    r.append(record)
+                    r.append(Record(record))
             ix += 1
         return r
 
@@ -101,5 +101,6 @@ class FileOrg(Loader):
 
     def reset(self):
         self.data_file.truncate(0)
+        self.data_file.seek(0)
         self.data_file.write(self.schema_header)
         self.data_file.flush()
