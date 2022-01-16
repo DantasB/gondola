@@ -72,11 +72,39 @@ def validate_ordered():
     relation.fileOrg.persist()
 
 
-def main():
-    validate_heap()
-    validate_vlheap()
-    validate_ordered()
+def validate_hash():
+    name = "AmigosHash"
+    fileOrg = "Hash"
+    column_defs = {
+        "id": {
+            "type": "int",
+            "size": 10
+        },
+        "nome": {
+            "type": "varchar",
+            "size": 255
+        }
+    }
+    relation = Relation(fileOrg, name, column_defs, bucket_size = 3)
+    record_data = ('1|"bernado"')
+    relation.insert(record_data)
+    record_data = ('4|"asdasd"')
+    relation.insert(record_data)
+    record_data = ('5|"lima"')
+    relation.insert(record_data)
+    record_data = ('10|"bergmonta"')
+    record_data = ('2|"bauzudo"')
+    relation.insert(record_data)
+    record_data = ('3|"Joao"')
+    relation.insert(record_data)
+    relation.delete(lambda r: r.id == 2)
+    relation.fileOrg.persist()
 
+def main():
+    #validate_heap()
+    #validate_vlheap()
+    #validate_ordered()
+    validate_hash()
     return
 
 

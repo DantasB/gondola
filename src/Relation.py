@@ -9,7 +9,7 @@ fileOrgs = {"VLHeap": VLHeap, "Heap": Heap, "Hash": Hash, "Ordered": Ordered}
 
 
 class Relation:
-    def __init__(self, fileOrg: str, name: str, column_defs: dict):
+    def __init__(self, fileOrg: str, name: str, column_defs: dict, **kwargs):
         """
         Recebe como argumento um fileOrg (str) e, as defs das colunas da Relation e seu nome
         Exemplo:
@@ -26,7 +26,7 @@ class Relation:
         """
         self.schema = Schema(relation_name=name, column_defs=column_defs)
         self.fileOrg = fileOrgs[fileOrg](
-            relation_name=name, schema_header=self.schema.metadata())
+            relation_name=name, schema_header=self.schema.metadata(), **kwargs)
 
     def insert(self, data):
         self.fileOrg.insert(Record(data))

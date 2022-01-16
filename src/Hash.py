@@ -1,6 +1,5 @@
 from FileOrg import FileOrg
 from typing import List
-from Block import Block
 
 
 class Hash(FileOrg):
@@ -9,29 +8,18 @@ class Hash(FileOrg):
         super().__init__(relation_name, schema_header)
         self.bucket_size = bucket_size
 
-    def __hashing(self, key: int) -> hash:
+    def hashing(self, key: int) -> hash:
         return f"{int(key/self.bucket_size)}|{key % self.bucket_size}"
 
-    def insert(self, records: List[dict]) -> None:
-        for record in records:
-            bucket, offset = self.__hashing(record.key).split('|')
-            if len(self.empty_list) > 0:
-                ix, offset = self.empty_list[-1]
-                self.write_record(ix, offset, record)
-                self.empty_list.pop()
-            else:
-                new_block = Block()
-                new_block.append(record)
-                self.append_block(new_block)
-                self.empty_list.append((self.block_count, record.size))
-            wanted_data = {}
-            if(type(record) == List):
-                for e in range(len(record)):
-                    if(record[e].id == record.key):
-                        wanted_data = record[e]
-            else:
-                wanted_data = record
-            return wanted_data
+    def go_to_location(self, bucket, offset):
+        self.data_file.seek(int(bucket)*self.bucket_size + offset + self.HEADER_SIZE)
+
+    def insert(self, record) -> None:
+        bucket, offset = self.hashing(record.id).split('|')
+        breakpoint()
+        offset = int(offset)
+        self.go_to_location(bucket, offset)
+        self.data_file.write(record.to_string() + '\n')
 
     def select_many(self, list_of_keys: List[int]) -> List[dict]:
         selected = []
