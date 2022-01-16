@@ -89,6 +89,7 @@ class Ordered(FileOrg):
         self.id_list.append(record.id)
 
     def persist(self):
+        self.heap.persist()
         metadata_file = open(self.metadata_path, 'w')
         lines = []
         lines.append(self.empty_list_to_str())
