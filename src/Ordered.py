@@ -87,6 +87,7 @@ class Ordered(FileOrg):
         # adições serão feitas de maneira indiscriminada (não serão reorganizadas no momento chave)
         self.heap.insert(record)
         self.id_list.append(record.id)
+        self.id_list.sort()
 
     def persist(self):
         self.heap.persist()
@@ -135,18 +136,14 @@ class Ordered(FileOrg):
     def reorganize(self):
         self.need_reorganize = False
         # ler as entradas no arquivo de extensão
-        new_records = []
-        for new_rec in self.heap.data_file.readlines():
-            if new_rec.startswith('#'):
-                continue
-            new_records.append(Record(new_rec))
+        new_records = self.heap.select(lambda r: True)
         # apagar tudo desse arquivo após ter recuperado a informação
         self.heap.reset()
         # pega os registros atuais (no arquivo original)
         main_records = self.select(lambda r: True)
-        self.reset()
+        self.data_clear()
         # id é apenas um exemplo de possibilidade de campo pelo qual ordenar
         sorted_records = self.__merge_sort(
             main_records + new_records)
         for record in sorted_records:
-            self.data_file.write(record.to_string())
+            self.data_file.write(record.to_string()+'\n')

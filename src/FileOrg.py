@@ -18,8 +18,7 @@ class FileOrg(Loader):
             metadata_file.write('\n')  # emptylist
             metadata_file.write('0\n')  # block_count
             metadata_file.write('0\n')  # record_count
-            metadata_file.write('False\n') # need_reorganize
-            metadata_file.flush()
+            metadata_file.write('False\n')  # need_reorganize
         metadata_file.seek(0)
         self.empty_list = self.load_list(metadata_file.readline())
         self.block_count = int(metadata_file.readline())
@@ -40,7 +39,7 @@ class FileOrg(Loader):
                 break
             for record in block.records:
                 if not record.is_empty and filter(record):
-                    r.append(Record(record))
+                    r.append(record)
             ix += 1
         return r
 
@@ -65,7 +64,8 @@ class FileOrg(Loader):
     def reorganize(self):
         records = self.select(lambda r: True)
         self.reset()
-        self.insert(records)
+        for r in records:
+            self.insert(r)
 
     def write_block(self, block, ix):
         self.data_file.seek(ix * self.BLOCK_SIZE + self.HEADER_SIZE)
@@ -99,8 +99,23 @@ class FileOrg(Loader):
         metadata_file.writelines(lines)
         metadata_file.close()
 
-    def reset(self):
+    def data_clear(self):
         self.data_file.truncate(0)
         self.data_file.seek(0)
         self.data_file.write(self.schema_header)
-        self.data_file.flush()
+
+    def metadata_clear(self):
+        metadata_file = self.load_file(self.metadata_path)
+        metadata_file.write('\n')  # emptylist
+        metadata_file.write('0\n')  # block_count
+        metadata_file.write('0\n')  # record_count
+        metadata_file.write('False\n')  # need_reorganize
+        self.empty_list = []
+        self.block_count = 0
+        self.record_count = 0
+        self.need_reorganize = False
+        metadata_file.close()
+
+    def reset(self):
+        self.data_clear()
+        self.metadata_clear()
