@@ -24,6 +24,3 @@ class Heap(FileOrg):
             self.append_block(new_block)
             self.empty_list.append((self.block_count-1, record.size))
         self.record_count += 1
-
-    def reorganize(self):
-        pass

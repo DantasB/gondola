@@ -5,7 +5,7 @@ class Record:
         self.size = size
         if len(content) > 0:
             self.size = len(content.encode('utf-8')) + 1
-            if content[0] != '\0':
+            if content[0] != '#':
                 self.content = content
                 self.attributes = content.split('|')
                 self.id = int(self.attributes[0])
@@ -18,7 +18,7 @@ class Record:
         if not self.is_empty:
             return self.content
         else:
-            return '\0' + ' '*(self.size-2)
+            return '#' + ' '*(self.size-2)
 
     def is_empty(self):
         return True if self.is_empty else False

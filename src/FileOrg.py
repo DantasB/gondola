@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from Base import Loader
 from Block import Block
 import os
@@ -5,11 +6,13 @@ import os
 
 class FileOrg(Loader):
     def __init__(self, relation_name, schema_header=None):
-        data_path = f"./src/{relation_name}/data.cbd"
+        self.data_path = f"./src/{relation_name}/data.cbd"
         self.metadata_path = f"./src/{relation_name}/metadata.cbd"
-        self.already_existed = True if os.path.exists(data_path) else False
-        self.data_file = self.load_file(data_path)
+        self.already_existed = True if os.path.exists(
+            self.data_path) else False
+        self.data_file = self.load_file(self.data_path)
         metadata_file = self.load_file(self.metadata_path)
+        self.schema_header = schema_header
         if schema_header:
             self.data_file.write(schema_header)
         if len(metadata_file.readlines()) <= 1:
@@ -49,6 +52,7 @@ class FileOrg(Loader):
                 break
             for record in block.records:
                 if not record.is_empty and filter(record):
+                    self.record_count -= 1
                     block.clear(record.offset)
                     self.empty_list.append((ix, record.offset))
             self.write_block(block, ix)
@@ -58,7 +62,9 @@ class FileOrg(Loader):
         raise NotImplementedError
 
     def reorganize(self):
-        raise NotImplementedError
+        records = self.select(lambda r: True)
+        self.reset()
+        self.insert(records)
 
     def write_block(self, block, ix):
         self.data_file.seek(ix * self.BLOCK_SIZE + self.HEADER_SIZE)
@@ -91,3 +97,8 @@ class FileOrg(Loader):
         metadata_file.seek(0)
         metadata_file.writelines(lines)
         metadata_file.close()
+
+    def reset(self):
+        self.data_file.truncate(0)
+        self.data_file.write(self.schema_header)
+        self.data_file.flush()

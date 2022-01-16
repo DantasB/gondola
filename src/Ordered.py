@@ -2,6 +2,9 @@ from tracemalloc import start
 from FileOrg import FileOrg
 from Block import Block
 from Heap import Heap
+from Record import Record
+
+# TODO: salvar need_reorganize no metadata.cdb
 
 
 class Ordered(FileOrg):
@@ -23,6 +26,7 @@ class Ordered(FileOrg):
         self.need_reorganize = False
 
     def delete(self, id):
+        self.need_reorganize = True
         if filter:
             super().delete(lambda r: r.id == id)
         else:
@@ -82,6 +86,7 @@ class Ordered(FileOrg):
         return r
 
     def insert(self, record):
+        self.need_reorganize = True
         # adições serão feitas de maneira indiscriminada (não serão reorganizadas no momento chave)
         self.heap.insert(record)
         self.id_list.append(record.id)
@@ -92,13 +97,16 @@ class Ordered(FileOrg):
         stringfied = [str(id) for id in self.id_list]
         f.write('|'.join(stringfied) + '\n')
 
-    def __merge_sort(self, records, start, ending):
+    def __merge_sort(self, records, start=0, ending=None):
+        if ending == None:
+            ending = len(records)
         if(ending - start > 1):
             mid = (ending+start)//2
 
             self.__merge_sort(records, start, mid)
             self.__merge_sort(records, mid, ending)
             self.__merge(records, start, mid, ending)
+        return records
 
     def __merge(self, records, start, mid, ending):
         left = records[start:mid]
@@ -111,7 +119,7 @@ class Ordered(FileOrg):
             elif(j >= len(right)):
                 records[k] = left[i]
                 i += 1
-            elif(left[i] < right[j]):
+            elif(left[i].id < right[j].id):
                 records[k] = left[i]
                 i += 1
             else:
@@ -119,19 +127,24 @@ class Ordered(FileOrg):
                 j += 1
 
     def reorganize(self):
-        new_records = []
+        self.need_reorganize = False
         # ler as entradas no arquivo de extensão
         new_records = [new_rec for new_rec in self.heap.data_file.readlines()]
         # apagar tudo desse arquivo após ter recuperado a informação
         self.heap.reset()
 
-        # pega os registros atuais (no arquivo original), e filtra pelos que não estão marcados como deletados)
-        records = self.select(lambda record: not record.isEmpty)
+        # pega os registros atuais (no arquivo original)
+        main_records = self.select(lambda r: True)
+        new_records = self.heap.select(lambda r: True)
+
+        self.reset()
 
         # id é apenas um exemplo de possibilidade de campo pelo qual ordenar
         sorted_records = self.__merge_sort(
-            new_records + filtered_excluded_records, "id")
+            main_records + new_records)
+
+        for record in sorted_records:
+            self.data_file.write(record.to_string()+'\n')
 
         # retirar todos os records marcados como deletados
         # fazer um merge sort com os registros que tenham sobrado
-        pass
