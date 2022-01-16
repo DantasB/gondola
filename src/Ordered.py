@@ -92,11 +92,31 @@ class Ordered(FileOrg):
         stringfied = [str(id) for id in self.id_list]
         f.write('|'.join(stringfied) + '\n')
 
-    def __merge_sort(self, records, order_field):
-        if(len(records) == 1):
-            return records[0]
-        else:
-            print('foi')
+    def __merge_sort(self, records, start, ending):
+        if(ending - start > 1):
+            mid = (ending+start)//2
+
+            self.__merge_sort(records, start, mid)
+            self.__merge_sort(records, mid, ending)
+            self.__merge(records, start, mid, ending)
+
+    def __merge(self, records, start, mid, ending):
+        left = records[start:mid]
+        right = records[mid:start]
+        i, j = 0, 0
+        for k in range(start, ending):
+            if(i >= len(left)):
+                records[k] = right[j]
+                j += 1
+            elif(j >= len(right)):
+                records[k] = left[i]
+                i += 1
+            elif(left[i] < right[j]):
+                records[k] = left[i]
+                i += 1
+            else:
+                records[k] = right[j]
+                j += 1
 
     def reorganize(self):
         new_records = []
