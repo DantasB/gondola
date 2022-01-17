@@ -18,7 +18,7 @@ def populate_relation(relation: Relation):
 
 
 def populate_relation_vlheap(relation: Relation):
-    for file_line in file_lines[:100]:
+    for file_line in file_lines:
         relation.insert(file_line.strip('\n'))
 
 
