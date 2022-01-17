@@ -117,10 +117,10 @@ def validate_hash():
 
 
 def main():
-    # validate_heap()
+    validate_heap()
     validate_vlheap()
-    # validate_ordered()
-    # validate_hash()
+    validate_ordered()
+    validate_hash()
     return
 
 
