@@ -18,6 +18,8 @@ class Record:
         if not self.is_empty:
             return self.content
         else:
+            if self.size == 1:
+                return ''
             return "#" + " " * (self.size - 2)
 
     def is_empty(self):
