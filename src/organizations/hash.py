@@ -7,7 +7,7 @@ class Hash(FileOrg):
 
     def __init__(self, relation_name, schema_header):
         super().__init__(relation_name, schema_header)
-        self.blocks_in_a_bucket = self.BUCKET_SIZE/self.BLOCK_SIZE
+        self.blocks_in_a_bucket = int(self.BUCKET_SIZE/self.BLOCK_SIZE)
         if not self.already_existed:
             f = open(self.metadata_path, 'a')
             f.write('\n')
@@ -25,7 +25,7 @@ class Hash(FileOrg):
         return key % self.ALLOCATED_BUCKETS
 
     def fill(self, n_blocks):
-        for _ in range(n_blocks):
+        for _ in range(int(n_blocks)):
             self.append_block(Block())
 
     def insert_bucket(self, ix, record):
@@ -42,34 +42,35 @@ class Hash(FileOrg):
                 pass
         raise Exception('Need Overflow')
 
-    def search_bucket(self, ix, record):
+    def search_bucket(self, ix, id):
         first_block_ix = ix * self.blocks_in_a_bucket
         if first_block_ix >= self.block_count:
             raise Exception('Empty Bucket')
         for i in range(self.blocks_in_a_bucket):
             b = self.read_block(first_block_ix + i)
             for recovered_record in b.records:
-                if(record.id == (recovered_record.id)):
+                if(id == int(recovered_record.id)):
                     return recovered_record
         raise Exception('Need Overflow')
 
-    def delete_bucket(self, ix, record):
+    def delete_bucket(self, ix, id):
         first_block_ix = ix * self.blocks_in_a_bucket
         if first_block_ix >= self.block_count:
             raise Exception('Empty Bucket')
         for i in range(self.blocks_in_a_bucket):
             b = self.read_block(first_block_ix + i)
             for recovered_record in b.records:
-                if(record.id == (recovered_record.id)):
+                if id == int(recovered_record.id):
                     b.clear(recovered_record.offset)
+                    self.write_block(b, first_block_ix + i)
                     return
         raise Exception('Need Overflow')
 
-    def search_overflow(self, bucket, record):
+    def search_overflow(self, bucket, id):
         for i, b in enumerate(self.overflow_list):
             if b == bucket:
                 try:
-                    self.search_bucket(i + self.ALLOCATED_BUCKETS + 1, record)
+                    self.search_bucket(i + self.ALLOCATED_BUCKETS, id)
                     return
                 except:
                     pass
@@ -79,18 +80,18 @@ class Hash(FileOrg):
         for i, b in enumerate(self.overflow_list):
             if b == bucket:
                 try:
-                    self.insert_bucket(i + self.ALLOCATED_BUCKETS + 1, record)
+                    self.insert_bucket(i + self.ALLOCATED_BUCKETS, record)
                     return
                 except:
                     pass
         self.overflow_list.append(bucket)
         self.insert_overflow(bucket, record)
 
-    def delete_overflow(self, bucket, record):
+    def delete_overflow(self, bucket, id):
         for i, b in enumerate(self.overflow_list):
             if b == bucket:
                 try:
-                    self.delete_bucket(i + self.ALLOCATED_BUCKETS + 1, record)
+                    self.delete_bucket(i + self.ALLOCATED_BUCKETS, id)
                     return
                 except:
                     pass
@@ -103,28 +104,27 @@ class Hash(FileOrg):
         except:
             self.insert_overflow(bucket, record)
 
-    def select_one(self, record):
-        bucket = self.hashing(int(record.id))
+    def select_id(self, id):
+        bucket = self.hashing(id)
         try:
-            self.search_bucket(bucket, record)
+            self.search_bucket(bucket, id)
         except:
-            self.search_overflow(bucket, record)
+            self.search_overflow(bucket, id)
 
-    def delete(self, record: Record) -> None:
-        bucket = self.hashing(int(record.id))
+    def delete(self, id: Record) -> None:
+        bucket = self.hashing(int(id))
         try:
-            self.delete_bucket(bucket, record)
-        except:
-            self.delete_overflow(bucket, record)
+            self.delete_bucket(bucket, id)
+        except Exception as e:
+            self.delete_overflow(bucket, id)
 
-    def select_list(self, list_of_records):
+    def select_list(self, list_of_ids):
         selected = []
-        for record in list_of_records:
-            selected.append[self.select_one(int(record.id))]
+        for id in list_of_ids:
+            selected.append[self.select_id(id)]
         return selected
 
     def persist(self):
-        self.heap.persist()
         metadata_file = open(self.metadata_path, 'w')
         lines = []
         lines.append(self.empty_list_to_str())

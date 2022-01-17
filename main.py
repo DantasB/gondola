@@ -46,7 +46,7 @@ def validate_heap():
     relation.fileOrg.reorganize()
     relation.fileOrg.persist()
     for _ in range(5):
-        random_number = randint(1,2022)
+        random_number = randint(1, 2022)
         relation.select(lambda r: int(r.id) == random_number)
 
 
@@ -72,7 +72,7 @@ def validate_vlheap():
     populate_relation_vlheap(relation)
     relation.fileOrg.persist()
     for _ in range(5):
-        random_number = randint(1,2022)
+        random_number = randint(1, 2022)
         relation.select(lambda r: int(r.id) == random_number)
 
 
@@ -98,7 +98,7 @@ def validate_ordered():
     populate_relation(relation)
     relation.fileOrg.persist()
     for _ in range(5):
-        random_number = randint(1,2022)
+        random_number = randint(1, 2022)
         relation.select(lambda r: int(r.id) == random_number)
 
 
@@ -123,9 +123,10 @@ def validate_hash():
 
     relation = Relation(fileOrg, name, column_defs)
     populate_relation(relation)
+    relation.delete(1983)
     relation.fileOrg.persist()
     for _ in range(5):
-        random_number = randint(1,2022)
+        random_number = randint(1, 2022)
         relation.select(lambda r: int(r.id) == random_number)
 
 
