@@ -105,11 +105,14 @@ class Hash(FileOrg):
             self.insert_overflow(bucket, record)
 
     def select_id(self, id):
+        self.number_of_read_blocks = 1
         bucket = self.hashing(id)
         try:
             self.search_bucket(bucket, id)
         except:
             self.search_overflow(bucket, id)
+        finally:
+            print(f"{self.number_of_read_blocks} blocks read")
 
     def delete(self, id: Record) -> None:
         bucket = self.hashing(int(id))

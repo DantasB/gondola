@@ -35,7 +35,6 @@ class Ordered(FileOrg):
         return block_ix, block_offset
 
     def __binary_search(self, id, start=0, end=None):
-        # https://www.geeksforgeeks.org/python-program-for-binary-search/
         if end == None:
             end = len(self.id_list) - 1
 
@@ -61,14 +60,14 @@ class Ordered(FileOrg):
             # Element is not present in the array
             raise Exception('[ERROR] Couldnt find ID')
 
-    def select_range(self, first_id, last_id):
-        # como fazer??
-        pass
 
     def select_id(self, id):
         if self.need_reorganize:
             self.reorganize()
-        return self.__binary_search(id)
+        self.number_of_read_blocks = 1
+        found_id = self.__binary_search(id)
+        print(f"{self.number_of_read_blocks} blocks read")
+        return found_id
 
     def select_list(self, filter_list):
         r = []
