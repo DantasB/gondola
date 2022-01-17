@@ -2,11 +2,11 @@ import os
 
 
 class Loader:
-    BLOCK_SIZE = 42
+    BLOCK_SIZE = 189
     HEADER_SIZE = 48
     RECORDS_IN_A_BLOCK = 3
-    RECORD_SIZE = 14
-    BUCKET_SIZE = 84
+    RECORD_SIZE = 63
+    BUCKET_SIZE = 189 * RECORDS_IN_A_BLOCK
     ALLOCATED_BUCKETS = 10
 
     def load_file(self, file_path):

@@ -11,7 +11,7 @@ class Block(Loader):
             new_rec = Record(record, offset)
             self.__append(new_rec)
             size += new_rec.size
-            offset += size
+            offset += new_rec.size
         if size < self.BLOCK_SIZE:
             self.__append(Record(offset=offset, size=self.BLOCK_SIZE - size))
 

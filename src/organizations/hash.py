@@ -49,7 +49,7 @@ class Hash(FileOrg):
         for i in range(self.blocks_in_a_bucket):
             b = self.read_block(first_block_ix + i)
             for recovered_record in b.records:
-                if(int(record.id) == recovered_int(record.id)):
+                if(record.id == (recovered_record.id)):
                     return recovered_record
         raise Exception('Need Overflow')
 
@@ -60,7 +60,7 @@ class Hash(FileOrg):
         for i in range(self.blocks_in_a_bucket):
             b = self.read_block(first_block_ix + i)
             for recovered_record in b.records:
-                if(int(record.id) == recovered_int(record.id)):
+                if(record.id == (recovered_record.id)):
                     b.clear(recovered_record.offset)
                     return
         raise Exception('Need Overflow')

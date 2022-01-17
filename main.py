@@ -13,7 +13,7 @@ def populate_relation(relation: Relation):
         data[0] = data[0].rjust(20, '0')
         data[1] = data[1].ljust(20, ' ')
         data[2] = data[2].ljust(20, ' ')
-        relation.insert(file_line.strip('\n'))
+        relation.insert('|'.join(data))
 
 
 def populate_relation_vlheap(relation: Relation):
@@ -65,7 +65,7 @@ def validate_vlheap():
     }
     relation = Relation(fileOrg, name, column_defs)
     populate_relation_vlheap(relation)
-    relation.delete(lambda r: int(r.id) == 423)
+    relation.delete(lambda r: int(r.id) == 9)
     relation.fileOrg.persist()
 
 
@@ -110,7 +110,7 @@ def validate_hash():
         }
     }
 
-    relation = Relation(fileOrg, name, column_defs, bucket_size=3)
+    relation = Relation(fileOrg, name, column_defs)
     populate_relation(relation)
     relation.delete(lambda r: int(r.id) == 2)
     relation.fileOrg.persist()
