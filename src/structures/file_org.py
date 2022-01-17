@@ -6,6 +6,7 @@ import os
 
 class FileOrg(Loader):
     def __init__(self, relation_name, schema_header=None):
+        self.number_of_read_blocks = 0
         self.data_path = f"./database/{relation_name}.data.cbd"
         self.metadata_path = f"./database/{relation_name}.metadata.cbd"
         self.already_existed = os.path.exists(self.data_path)
@@ -30,6 +31,7 @@ class FileOrg(Loader):
         return "|".join([",".join(map(str, value)) for value in self.empty_list]) + "\n"
 
     def select(self, filter):
+        self.number_of_read_blocks = 0
         r = []
         ix = 0
         while True:
@@ -41,6 +43,7 @@ class FileOrg(Loader):
                 if not record.is_empty and filter(record):
                     r.append(record)
             ix += 1
+        print(f"{self.number_of_read_blocks} blocks read")
         return r
 
     def delete(self, filter):
@@ -77,6 +80,7 @@ class FileOrg(Loader):
         self.block_count += 1
 
     def read_block(self, ix):
+        self.number_of_read_blocks += 1
         self.data_file.seek(ix * self.BLOCK_SIZE + self.HEADER_SIZE)
         buffer = self.data_file.read(self.BLOCK_SIZE)
         if len(buffer) == 0:

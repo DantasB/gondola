@@ -1,4 +1,5 @@
 from src.structures.relation import Relation
+from random import randint
 
 data_file = open('./input/data.csv', 'r')
 file_lines = data_file.readlines()
@@ -22,6 +23,7 @@ def populate_relation_vlheap(relation: Relation):
 
 
 def validate_heap():
+    print("Validando Heap")
     name = "ZodiacoHeap"
     fileOrg = "Heap"
     column_defs = {
@@ -41,12 +43,15 @@ def validate_heap():
 
     relation = Relation(fileOrg, name, column_defs)
     populate_relation(relation)
-    relation.delete(lambda r: int(r.id) == 423)
     relation.fileOrg.reorganize()
     relation.fileOrg.persist()
+    for _ in range(5):
+        random_number = randint(1,2022)
+        relation.select(lambda r: int(r.id) == random_number)
 
 
 def validate_vlheap():
+    print("Validando VLHeap")
     name = "ZodiacoVL"
     fileOrg = "VLHeap"
     column_defs = {
@@ -65,11 +70,14 @@ def validate_vlheap():
     }
     relation = Relation(fileOrg, name, column_defs)
     populate_relation_vlheap(relation)
-    relation.delete(lambda r: int(r.id) == 9)
     relation.fileOrg.persist()
+    for _ in range(5):
+        random_number = randint(1,2022)
+        relation.select(lambda r: int(r.id) == random_number)
 
 
 def validate_ordered():
+    print("Validando Ordered")
     name = "ZodiacoOrdered"
     fileOrg = "Ordered"
     column_defs = {
@@ -88,11 +96,14 @@ def validate_ordered():
     }
     relation = Relation(fileOrg, name, column_defs)
     populate_relation(relation)
-    relation.delete(lambda r: int(r.id) == 423)
     relation.fileOrg.persist()
+    for _ in range(5):
+        random_number = randint(1,2022)
+        relation.select(lambda r: int(r.id) == random_number)
 
 
 def validate_hash():
+    print("Validando Hash")
     name = "ZodiacoHash"
     fileOrg = "Hash"
     column_defs = {
@@ -112,8 +123,10 @@ def validate_hash():
 
     relation = Relation(fileOrg, name, column_defs)
     populate_relation(relation)
-    relation.delete(lambda r: int(r.id) == 2)
     relation.fileOrg.persist()
+    for _ in range(5):
+        random_number = randint(1,2022)
+        relation.select(lambda r: int(r.id) == random_number)
 
 
 def main():
